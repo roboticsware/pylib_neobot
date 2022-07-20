@@ -16,6 +16,55 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 # Boston, MA  02111-1307  USA
 
+import signal
+
+from neobot.scanner import Scanner
+from neobot.mode import Mode
+from neobot.keyboard import Keyboard
+from neobot.runner import Runner
+from neobot.model import DeviceType
+from neobot.model import DataType
+from neobot.neosoco import Neosoco
+
 __version__ = "0.1.0"
 
-__all__ = ["NEO SoCo"]
+__all__ = ["DeviceType", "DataType", "Neosoco", "Keyboard", "scan", "is_link_mode", "link_mode", "dispose", "set_executable", "wait", "wait_until_ready", "wait_until", "when_do", "while_do", "parallel"]
+
+def scan():
+    Scanner.scan()
+
+def is_link_mode():
+    return Mode.is_link_mode()
+
+def link_mode(url='ws://127.0.0.1:59418'):
+    Mode.set_link_mode(url)
+
+def dispose():
+    Runner.dispose_all()
+
+def set_executable(execute):
+    Runner.set_executable(execute)
+
+def wait(milliseconds):
+    Runner.wait(milliseconds)
+
+def wait_until_ready():
+    Runner.wait_until_ready()
+
+def wait_until(condition, args=None):
+    Runner.wait_until(condition, args)
+
+def when_do(condition, do, args=None):
+    Runner.when_do(condition, do, args)
+
+def while_do(condition, do, args=None):
+    Runner.while_do(condition, do, args)
+
+def parallel(*functions):
+    Runner.parallel(functions)
+
+def _handle_signal(signal, frame):
+    Runner.shutdown()
+    raise SystemExit
+
+signal.signal(signal.SIGINT, _handle_signal)

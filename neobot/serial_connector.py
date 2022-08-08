@@ -28,7 +28,8 @@ from neobot.connector import Result
 BAUD_RATE = 115200
 VALID_PACKET_LENGTH = 8
 RETRY = 10
-TIMEOUT = 0.1
+TIMEOUT = 0.4
+START_BYTES = bytearray([0xab, 0xcd])
 
 class SerialConnector(object):
     def __init__(self, tag, connection_checker, loader=None):
@@ -59,7 +60,15 @@ class SerialConnector(object):
     def _open_port(self, port_name):
         if port_name:
             try:
-                s = serial.Serial(port_name, BAUD_RATE, rtscts=True, timeout=0.1)
+                s = serial.Serial(
+                    port = port_name, # For example, '/dev/cu.SLAB_USBtoUART',
+                    baudrate = BAUD_RATE,
+                    parity = serial.PARITY_NONE,
+                    stopbits = serial.STOPBITS_ONE,
+                    bytesize = serial.EIGHTBITS,
+                    # Number of serial commands to accept before timing out
+                    timeout=0.1, 
+                )
                 s.reset_input_buffer()
                 s.reset_output_buffer()
                 self._port_name = port_name
@@ -69,7 +78,7 @@ class SerialConnector(object):
                     return result
                 s.close()
             except:
-                pass
+                pass # pass SerialException
         return Result.NOT_AVAILABLE
 
     def close(self):
@@ -95,28 +104,34 @@ class SerialConnector(object):
         if self._found:
             if state == State.CONNECTED:
                 address = self._address
-                if len(address) >= 12:
+                if len(address) >= 12 and address != '000000000000':
                     self._print_message("Connected: {} {}:{}:{}:{}:{}:{}".format(self._port_name, address[10:12], address[8:10], address[6:8], address[4:6], address[2:4], address[0:2]))
                 else:
                     self._print_message("Connected: {}".format(self._port_name))
             elif state == State.CONNECTION_LOST:
                 self._print_error("Connection lost")
 
-    def _read_line(self, serial, start_byte):
+    def _read_line(self, serial, start_byte=None):
         try:
             line = bytearray()
-            terminator = ord("\r")
+            c = serial.read(1) # 1byte
             while True:
-                c = serial.read()[0]
-                line.append(c)
-                if c == terminator: break
-            return line.decode("utf-8")
+                if c:
+                    # Checks for more bytes in the input buffer
+                    bufferBytes = serial.inWaiting()
+                    if bufferBytes:
+                        line = c + serial.read(bufferBytes)
+                        print('Recv: ', line) # For debug, temporary
+                        if line[:2] == start_byte: 
+                            return line
+                else:
+                    return ""
         except:
             return ""
 
     def _read_packet(self, serial, start_byte=None):
         try:
-            packet = self._read_line(serial)
+            packet = self._read_line(serial, start_byte)
             if start_byte is None:
                 return packet
             if packet[:2] == start_byte:
@@ -128,14 +143,15 @@ class SerialConnector(object):
     def write(self, packet):
         if self._serial:
             try:
-                self._serial.write(packet.encode())
+                self._serial.write(bytes.fromhex(packet))
+                print('Sent: ', bytes.fromhex(packet)) # For debug, temporary
             except:
                 pass
 
     def read(self):
         if self._serial:
             try:
-                packet = self._read_line(self._serial)
+                packet = self._read_line(self._serial, START_BYTES)
                 if len(packet) == VALID_PACKET_LENGTH:
                     if self._found == False:
                         self._check_connection(self._serial)
@@ -156,15 +172,12 @@ class SerialConnector(object):
         return None
 
     def _check_port(self, serial):
-        self._read_packet(serial)
-        packet1 = self._read_packet(serial)
-        packet2 = self._read_packet(serial)
-        if packet1:
-            if len(packet1) == VALID_PACKET_LENGTH:
-                return self._check_connection(serial)
-            elif packet1 and len(packet2) == 2:
-                self._print_error("Not connected")
-                return Result.NOT_CONNECTED
+        for i in range(RETRY):
+            packet = self._read_packet(serial, bytearray([0xab, 0xcd]))
+            if packet:
+                if len(packet) == VALID_PACKET_LENGTH:
+                    self._set_connection_state(State.CONNECTED)
+                    return Result.FOUND
         return Result.NOT_AVAILABLE
 
     def _check_connection(self, serial):

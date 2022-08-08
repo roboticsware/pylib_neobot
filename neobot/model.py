@@ -16,6 +16,8 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 # Boston, MA  02111-1307  USA
 
+from functools import reduce
+
 
 DeviceType = type("Enum", (), {"SENSOR": 0, "EFFECTOR": 1, "EVENT": 2, "COMMAND": 3})
 DataType = type("Enum", (), {"INTEGER": 4, "FLOAT": 5, "STRING": 6})
@@ -368,6 +370,10 @@ class Neobot(NamedElement):
                 result += "0"
             return result + value
         return value
+
+    def _make_checksum(self, cmd):
+        # Strip header and accumulate to the end
+        return reduce(lambda x, y: x+y, bytes.fromhex(cmd[4:])) & 0xFF
 
     def _request_motoring_data(self):
         pass

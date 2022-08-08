@@ -25,41 +25,9 @@ from neobot.mode import Mode
 class Neosoco(Robot):
     ID = "kr.neobot.physical.neosoco"
 
-    LEFT_WHEEL = 0x00400000
-    RIGHT_WHEEL = 0x00400001
-    BUZZER = 0x00400002
-    OUTPUT_A = 0x00400003
-    OUTPUT_B = 0x00400004
-    TOPOLOGY = 0x00400005
-    LEFT_LED = 0x00400006
-    RIGHT_LED = 0x00400007
-    NOTE = 0x00400008
-    LINE_TRACER_MODE = 0x00400009
-    LINE_TRACER_SPEED = 0x0040000a
-    IO_MODE_A = 0x0040000b
-    IO_MODE_B = 0x0040000c
-    CONFIG_PROXIMITY = 0x0040000d
-    CONFIG_GRAVITY = 0x0040000e
-    CONFIG_BAND_WIDTH = 0x0040000f
-
-    SIGNAL_STRENGTH = 0x00400010
-    LEFT_PROXIMITY = 0x00400011
-    RIGHT_PROXIMITY = 0x00400012
-    LEFT_FLOOR = 0x00400013
-    RIGHT_FLOOR = 0x00400014
-    ACCELERATION = 0x00400015
-    LIGHT = 0x00400016
-    TEMPERATURE = 0x00400017
-    INPUT_A = 0x00400018
-    INPUT_B = 0x00400019
-    LINE_TRACER_STATE = 0x0040001a
-    TILT = 0x0040001b
-    BATTERY_STATE = 0x0040001c
-
-    TOPOLOGY_NONE = 0
-    TOPOLOGY_DAISY_CHAIN = 1
-    TOPOLOGY_STAR = 2
-    TOPOLOGY_EXTENDED_STAR = 3
+    OUTPUT_1 = 0x00400000
+    OUTPUT_2 = 0x00400001
+    OUTPUT_3 = 0x00400002
 
     LED_OFF = 0
     LED_BLUE = 1
@@ -611,6 +579,21 @@ class Neosoco(Robot):
         else:
             if isinstance(left_color, (int, float)):
                 self.write(Neosoco.RIGHT_LED, int(left_color))
+
+    def led_on(self, port: str, brightness: str):
+        if isinstance(port, str) and isinstance(brightness, int):
+            if port.lower() =='out1':
+                self.write(Neosoco.OUTPUT_1, Util.round(brightness)) 
+            elif port.lower() =='out2':
+                self.write(Neosoco.OUTPUT_2, Util.round(brightness)) 
+            elif port.lower() =='out3':
+                self.write(Neosoco.OUTPUT_3, Util.round(brightness)) 
+            elif port.lower() =='all':
+                self.write(Neosoco.OUTPUT_1, Util.round(brightness)) 
+                self.write(Neosoco.OUTPUT_2, Util.round(brightness)) 
+                self.write(Neosoco.OUTPUT_3, Util.round(brightness)) 
+        else:
+            raise TypeError
 
     def left_led(self, color):
         if isinstance(color, (int, float)):

@@ -29,6 +29,8 @@ from neobot.neosoco import Neosoco
 from neobot.serial_connector import SerialConnector
 from neobot.linker import Linker
 
+START_BYTES = 'CDAB'
+
 
 class NeosocoConnectionChecker(object):
     def __init__(self, neobot):
@@ -77,22 +79,12 @@ class NeosocoNeobot(Neobot):
         self._thread = None
         self._thread_lock = threading.Lock()
 
-        self._left_wheel = 0
-        self._right_wheel = 0
+        self._output1 = 0
+        self._output2 = 0
+        self._output3 = 0
+        self._mla = 0
+        self._mra = 0
         self._buzzer = 0
-        self._output_a = 0
-        self._output_b = 0
-        self._topology = 0
-        self._left_led = 0
-        self._right_led = 0
-        self._note = 0
-        self._line_tracer_mode = 0
-        self._line_tracer_speed = 5
-        self._io_mode_a = 0
-        self._io_mode_b = 0
-        self._config_proximity = 2
-        self._config_gravity = 0
-        self._config_band_width = 3
 
         self._topology_written = False
         self._left_led_written = False
@@ -125,36 +117,10 @@ class NeosocoNeobot(Neobot):
     def _create_model(self):
         from neobot.neosoco import Neosoco
         dict = self._device_dict = {}
-        dict[Neosoco.LEFT_WHEEL] = self._left_wheel_device = self._add_device(Neosoco.LEFT_WHEEL, "LeftWheel", DeviceType.EFFECTOR, DataType.INTEGER, 1, -100, 100, 0)
-        dict[Neosoco.RIGHT_WHEEL] = self._right_wheel_device = self._add_device(Neosoco.RIGHT_WHEEL, "RightWheel", DeviceType.EFFECTOR, DataType.INTEGER, 1, -100, 100, 0)
-        dict[Neosoco.BUZZER] = self._buzzer_device = self._add_device(Neosoco.BUZZER, "Buzzer", DeviceType.EFFECTOR, DataType.FLOAT, 1, 0, 167772.15, 0.0)
-        dict[Neosoco.OUTPUT_A] = self._output_a_device = self._add_device(Neosoco.OUTPUT_A, "OutputA", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)
-        dict[Neosoco.OUTPUT_B] = self._output_b_device = self._add_device(Neosoco.OUTPUT_B, "OutputB", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)
-        dict[Neosoco.TOPOLOGY] = self._topology_device = self._add_device(Neosoco.TOPOLOGY, "Topology", DeviceType.COMMAND, DataType.INTEGER, 1, 0, 15, 0)
-        dict[Neosoco.LEFT_LED] = self._left_led_device = self._add_device(Neosoco.LEFT_LED, "LeftLed", DeviceType.COMMAND, DataType.INTEGER, 1, 0, 7, 0)
-        dict[Neosoco.RIGHT_LED] = self._right_led_device = self._add_device(Neosoco.RIGHT_LED, "RightLed", DeviceType.COMMAND, DataType.INTEGER, 1, 0, 7, 0)
-        dict[Neosoco.NOTE] = self._note_device = self._add_device(Neosoco.NOTE, "Note", DeviceType.COMMAND, DataType.INTEGER, 1, 0, 88, 0)
-        dict[Neosoco.LINE_TRACER_MODE] = self._line_tracer_mode_device = self._add_device(Neosoco.LINE_TRACER_MODE, "LineTracerMode", DeviceType.COMMAND, DataType.INTEGER, 1, 0, 15, 0)
-        dict[Neosoco.LINE_TRACER_SPEED] = self._line_tracer_speed_device = self._add_device(Neosoco.LINE_TRACER_SPEED, "LineTracerSpeed", DeviceType.COMMAND, DataType.INTEGER, 1, 1, 8, 5)
-        dict[Neosoco.IO_MODE_A] = self._io_mode_a_device = self._add_device(Neosoco.IO_MODE_A, "IoModeA", DeviceType.COMMAND, DataType.INTEGER, 1, 0, 15, 0)
-        dict[Neosoco.IO_MODE_B] = self._io_mode_b_device = self._add_device(Neosoco.IO_MODE_B, "IoModeB", DeviceType.COMMAND, DataType.INTEGER, 1, 0, 15, 0)
-        dict[Neosoco.CONFIG_PROXIMITY] = self._config_proximity_device = self._add_device(Neosoco.CONFIG_PROXIMITY, "ConfigProximity", DeviceType.COMMAND, DataType.INTEGER, 1, 1, 7, 2)
-        dict[Neosoco.CONFIG_GRAVITY] = self._config_gravity_device = self._add_device(Neosoco.CONFIG_GRAVITY, "ConfigGravity", DeviceType.COMMAND, DataType.INTEGER, 1, 0, 3, 0)
-        dict[Neosoco.CONFIG_BAND_WIDTH] = self._config_band_width_device = self._add_device(Neosoco.CONFIG_BAND_WIDTH, "ConfigBandWidth", DeviceType.COMMAND, DataType.INTEGER, 1, 1, 8, 3)
-        dict[Neosoco.SIGNAL_STRENGTH] = self._signal_strength_device = self._add_device(Neosoco.SIGNAL_STRENGTH, "SignalStrength", DeviceType.SENSOR, DataType.INTEGER, 1, -128, 0, 0)
-        dict[Neosoco.LEFT_PROXIMITY] = self._left_proximity_device = self._add_device(Neosoco.LEFT_PROXIMITY, "LeftProximity", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
-        dict[Neosoco.RIGHT_PROXIMITY] = self._right_proximity_device = self._add_device(Neosoco.RIGHT_PROXIMITY, "RightProximity", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
-        dict[Neosoco.LEFT_FLOOR] = self._left_floor_device = self._add_device(Neosoco.LEFT_FLOOR, "LeftFloor", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
-        dict[Neosoco.RIGHT_FLOOR] = self._right_floor_device = self._add_device(Neosoco.RIGHT_FLOOR, "RightFloor", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
-        dict[Neosoco.ACCELERATION] = self._acceleration_device = self._add_device(Neosoco.ACCELERATION, "Acceleration", DeviceType.SENSOR, DataType.INTEGER, 3, -32768, 32767, 0)
-        dict[Neosoco.LIGHT] = self._light_device = self._add_device(Neosoco.LIGHT, "Light", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 65535, 0)
-        dict[Neosoco.TEMPERATURE] = self._temperature_device = self._add_device(Neosoco.TEMPERATURE, "Temperature", DeviceType.SENSOR, DataType.INTEGER, 1, -40, 88, 0)
-        dict[Neosoco.INPUT_A] = self._input_a_device = self._add_device(Neosoco.INPUT_A, "InputA", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
-        dict[Neosoco.INPUT_B] = self._input_b_device = self._add_device(Neosoco.INPUT_B, "InputB", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
-        dict[Neosoco.LINE_TRACER_STATE] = self._line_tracer_state_device = self._add_device(Neosoco.LINE_TRACER_STATE, "LineTracerState", DeviceType.EVENT, DataType.INTEGER, 1, 0, 255, 0)
-        dict[Neosoco.TILT] = self._tilt_device = self._add_device(Neosoco.TILT, "Tilt", DeviceType.EVENT, DataType.INTEGER, 1, -3, 3, 0)
-        dict[Neosoco.BATTERY_STATE] = self._battery_state_device = self._add_device(Neosoco.BATTERY_STATE, "BatteryState", DeviceType.EVENT, DataType.INTEGER, 1, 0, 2, 2)
-
+        dict[Neosoco.OUTPUT_1] = self._output_1_device = self._add_device(Neosoco.OUTPUT_1, "Output1", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)
+        dict[Neosoco.OUTPUT_2] = self._output_2_device = self._add_device(Neosoco.OUTPUT_2, "Output2", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)
+        dict[Neosoco.OUTPUT_3] = self._output_3_device = self._add_device(Neosoco.OUTPUT_3, "Output3", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)
+       
     def find_device_by_id(self, device_id):
         return self._device_dict.get(device_id)
 
@@ -247,44 +213,9 @@ class NeosocoNeobot(Neobot):
 
     def _request_motoring_data(self):
         with self._thread_lock:
-            self._left_wheel = self._left_wheel_device.read()
-            self._right_wheel = self._right_wheel_device.read()
-            self._buzzer = self._buzzer_device.read()
-            self._output_a = self._output_a_device.read()
-            self._output_b = self._output_b_device.read()
-            if self._topology_device._is_written():
-                self._topology = self._topology_device.read()
-                self._topology_written = True
-            if self._left_led_device._is_written():
-                self._left_led = self._left_led_device.read()
-                self._left_led_written = True
-            if self._right_led_device._is_written():
-                self._right_led = self._right_led_device.read()
-                self._right_led_written = True
-            if self._note_device._is_written():
-                self._note = self._note_device.read()
-                self._note_written = True
-            if self._line_tracer_mode_device._is_written():
-                self._line_tracer_mode = self._line_tracer_mode_device.read()
-                self._line_tracer_mode_written = True
-            if self._line_tracer_speed_device._is_written():
-                self._line_tracer_speed = self._line_tracer_speed_device.read()
-                self._line_tracer_speed_written = True
-            if self._io_mode_a_device._is_written():
-                self._io_mode_a = self._io_mode_a_device.read()
-                self._io_mode_a_written = True
-            if self._io_mode_b_device._is_written():
-                self._io_mode_b = self._io_mode_b_device.read()
-                self._io_mode_b_written = True
-            if self._config_proximity_device._is_written():
-                self._config_proximity = self._config_proximity_device.read()
-                self._config_proximity_written = True
-            if self._config_gravity_device._is_written():
-                self._config_gravity = self._config_gravity_device.read()
-                self._config_gravity_written = True
-            if self._config_band_width_device._is_written():
-                self._config_band_width = self._config_band_width_device.read()
-                self._config_band_width_written = True
+            self._output_1 = self._output_1_device.read()
+            self._output_2 = self._output_2_device.read()
+            self._output_3 = self._output_3_device.read()
         self._clear_written()
 
     def _color_to_rgb(self, color):
@@ -306,81 +237,16 @@ class NeosocoNeobot(Neobot):
     def _encode_motoring_packet(self, address):
         result = ""
         with self._thread_lock:
-            if self._model_code == 0x0E:
-                result += "10"
-                result += self._to_hex(self._left_wheel)
-                result += self._to_hex(self._right_wheel)
-                rgb = self._color_to_rgb(self._left_led)
-                result += self._to_hex(rgb[0])
-                result += self._to_hex(rgb[1])
-                result += self._to_hex(rgb[2])
-                rgb = self._color_to_rgb(self._right_led)
-                result += self._to_hex(rgb[0])
-                result += self._to_hex(rgb[1])
-                result += self._to_hex(rgb[2])
-                result += "000000"
-                temp = self._line_tracer_mode & 0x0f
-                if temp > 7: temp += 1
-                if self._line_tracer_mode_written:
-                    self._line_tracer_count = 0
-                    if temp > 0:
-                        self._line_tracer_flag = (self._line_tracer_flag % 15) + 1
-                        self._line_tracer_event = 1
-                    else:
-                        self._line_tracer_event = 0
-                    self._line_tracer_mode_written = False
-                temp |= (self._line_tracer_flag & 0x0f) << 4
-                result += self._to_hex(temp)
-                temp = (self._line_tracer_speed & 0x0f) << 4
-                temp |= self._speed_to_gain(self._line_tracer_speed) & 0x0f
-                result += self._to_hex(temp)
-                temp = (self._config_proximity & 0x07) << 5
-                temp |= (self._config_band_width & 0x07) << 2
-                temp |= self._config_gravity & 0x03
-                result += self._to_hex(temp)
-                temp = (self._io_mode_a & 0x0f) << 4
-                temp |= self._io_mode_b & 0x0f
-                result += self._to_hex(temp)
-                result += self._to_hex(self._output_a)
-                result += self._to_hex(self._output_b)
-                if self._note > 0:
-                    result += "01"
-                    result += self._to_hex(self._note)
-                else:
-                    temp = self._buzzer
-                    if temp > 6500: temp = 6500
-                    result += self._to_hex2(Util.round(temp * 10) + 512)
-            else:
-                result += self._to_hex(self._topology & 0x0f)
-                result += "0010"
-                result += self._to_hex(self._left_wheel)
-                result += self._to_hex(self._right_wheel)
-                result += self._to_hex(self._left_led)
-                result += self._to_hex(self._right_led)
-                result += self._to_hex3(Util.round(self._buzzer * 100))
-                result += self._to_hex(self._note)
-                if self._line_tracer_mode_written:
-                    if self._line_tracer_mode > 0:
-                        self._line_tracer_flag ^= 0x80
-                        self._line_tracer_event = 1
-                    self._line_tracer_mode_written = False
-                temp = (self._line_tracer_mode & 0x0f) << 3
-                temp |= (self._line_tracer_speed - 1) & 0x07
-                temp |= self._line_tracer_flag & 0x80
-                result += self._to_hex(temp)
-                result += self._to_hex(self._config_proximity)
-                temp = (self._config_gravity & 0x0f) << 4
-                temp |= self._config_band_width & 0x0f
-                result += self._to_hex(temp)
-                temp = (self._io_mode_a & 0x0f) << 4
-                temp |= self._io_mode_b & 0x0f
-                result += self._to_hex(temp)
-                result += self._to_hex(self._output_a)
-                result += self._to_hex(self._output_b)
-                result += "000000"
-        result += "-"
-        result += address
-        result += "\r"
+            result += START_BYTES
+            result += self._to_hex(self._output_1) # OUT1
+            result += self._to_hex(self._output_2) # OUT2
+            result += self._to_hex(self._output_3) # OUT3
+            result += self._to_hex(0) # MLA
+            result += self._to_hex(0) # MRA
+            result += self._to_hex(0) # BUZZER
+            result += self._to_hex(0) # FND
+            result += self._to_hex(0) # Not Used
+            result += self._to_hex(self._make_checksum(result)) # Checksum
         return result
 
     def _decode_sensory_packet(self, packet):
@@ -522,12 +388,12 @@ class NeosocoNeobot(Neobot):
         if connector:
             packet = connector.read()
             if packet:
-                if self._decode_sensory_packet(packet):
+                # if self._decode_sensory_packet(packet): # Temporary blocking
                     if self._ready == False:
                         self._ready = True
                         Runner.register_checked()
                     self._notify_sensory_device_data_changed()
-                return True
+                    return True
         return False
 
     def _send(self, connector):

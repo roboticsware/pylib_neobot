@@ -120,6 +120,11 @@ class NeosocoNeobot(Neobot):
         dict[Neosoco.OUTPUT_1] = self._output_1_device = self._add_device(Neosoco.OUTPUT_1, "Output1", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)
         dict[Neosoco.OUTPUT_2] = self._output_2_device = self._add_device(Neosoco.OUTPUT_2, "Output2", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)
         dict[Neosoco.OUTPUT_3] = self._output_3_device = self._add_device(Neosoco.OUTPUT_3, "Output3", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)
+        dict[Neosoco.INPUT_1] = self._input_1_device = self._add_device(Neosoco.INPUT_1, "Input1", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
+        dict[Neosoco.INPUT_2] = self._input_2_device = self._add_device(Neosoco.INPUT_2, "Input2", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
+        dict[Neosoco.INPUT_3] = self._input_3_device = self._add_device(Neosoco.INPUT_3, "Input3", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
+        dict[Neosoco.REMOCTL] = self._remoctl_device = self._add_device(Neosoco.REMOCTL, "RemoteCtl", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
+        dict[Neosoco.BATTERY] = self._battery_device = self._add_device(Neosoco.BATTERY, "Battery", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
        
     def find_device_by_id(self, device_id):
         return self._device_dict.get(device_id)
@@ -250,150 +255,23 @@ class NeosocoNeobot(Neobot):
         return result
 
     def _decode_sensory_packet(self, packet):
-        packet = str(packet)
-        if self._model_code == 0x0E:
-            value = int(packet[0:1], 16)
-            if value != 1: return False
-            value = int(packet[6:8], 16)
-            self._left_proximity_device._put(value)
-            value = int(packet[8:10], 16)
-            self._right_proximity_device._put(value)
-            value2 = int(packet[38:40], 16)
-            if (value2 & 0x01) == 0:
-                self._light = int(packet[10:14], 16)
-            else:
-                value = int(packet[10:12], 16)
-                if value > 0x7f: value -= 0x100
-                self._temperature = Util.round(value / 2.0 + 23)
-            self._light_device._put(self._light)
-            self._temperature_device._put(self._temperature)
-            value = int(packet[14:16], 16)
-            self._left_floor_device._put(value)
-            value = int(packet[16:18], 16)
-            self._right_floor_device._put(value)
-            acc_x = int(packet[18:22], 16)
-            if acc_x > 0x7fff: acc_x -= 0x10000
-            self._acceleration_device._put_at(0, acc_x)
-            acc_y = int(packet[22:26], 16)
-            if acc_y > 0x7fff: acc_y -= 0x10000
-            self._acceleration_device._put_at(1, acc_y)
-            acc_z = int(packet[26:30], 16)
-            if acc_z > 0x7fff: acc_z -= 0x10000
-            self._acceleration_device._put_at(2, acc_z)
-            if acc_z < 8192 and acc_x > 8192 and acc_y > -4096 and acc_y < 4096: value = 1
-            elif acc_z < 8192 and acc_x < -8192 and acc_y > -4096 and acc_y < 4096: value = -1
-            elif acc_z < 8192 and acc_y > 8192 and acc_x > -4096 and acc_x < 4096: value = 2
-            elif acc_z < 8192 and acc_y < -8192 and acc_x > -4096 and acc_x < 4096: value = -2
-            elif acc_z > 12288 and acc_x > -8192 and acc_x < 8192 and acc_y > -8192 and acc_y < 8192: value = 3
-            elif acc_z < -12288 and acc_x > -4096 and acc_x < 4096 and acc_y > -4096 and acc_y < 4096: value = -3
-            else: value = 0
-            if value != self._event_tilt:
-                self._tilt_device._put(value, self._event_tilt != -4)
-                self._event_tilt = value
-            value = int(packet[30:32], 16)
-            self._input_a_device._put(value)
-            value = int(packet[32:34], 16)
-            self._input_b_device._put(value)
-            value = int(packet[36:38], 16)
-            value -= 0x100
-            self._signal_strength_device._put(value)
-            value = (value2 >> 6) & 0x03
-            if (value & 0x02) != 0:
-                if self._line_tracer_event == 1:
-                    if value == 0x02:
-                        self._line_tracer_count += 1
-                        if self._line_tracer_count > 5: self._line_tracer_event = 2
-                    else:
-                        self._line_tracer_event = 2
-                if self._line_tracer_event == 2:
-                    if value != self._line_tracer_state or self._line_tracer_count > 5:
-                        self._line_tracer_state = value
-                        self._line_tracer_state_device._put(value << 5)
-                        if value == 0x02:
-                            self._line_tracer_event = 0
-                            self._line_tracer_count = 0
-            value = (value2 >> 1) & 0x03
-            if value == 0: value = 2
-            elif value >= 2: value = 0
-            if value != self._event_battery_state:
-                self._battery_state_device._put(value, self._event_battery_state != -1)
-                self._event_battery_state = value
-        else:
-            value = int(packet[4:5], 16)
-            if value != 1: return False
-            value = int(packet[6:8], 16)
-            value -= 0x100
-            self._signal_strength_device._put(value)
-            value = int(packet[8:10], 16)
-            self._left_proximity_device._put(value)
-            value = int(packet[10:12], 16)
-            self._right_proximity_device._put(value)
-            value = int(packet[12:14], 16)
-            self._left_floor_device._put(value)
-            value = int(packet[14:16], 16)
-            self._right_floor_device._put(value)
-            acc_x = int(packet[16:20], 16)
-            if acc_x > 0x7fff: acc_x -= 0x10000
-            self._acceleration_device._put_at(0, acc_x)
-            acc_y = int(packet[20:24], 16)
-            if acc_y > 0x7fff: acc_y -= 0x10000
-            self._acceleration_device._put_at(1, acc_y)
-            acc_z = int(packet[24:28], 16)
-            if acc_z > 0x7fff: acc_z -= 0x10000
-            self._acceleration_device._put_at(2, acc_z)
-            if acc_z < 8192 and acc_x > 8192 and acc_y > -4096 and acc_y < 4096: value = 1
-            elif acc_z < 8192 and acc_x < -8192 and acc_y > -4096 and acc_y < 4096: value = -1
-            elif acc_z < 8192 and acc_y > 8192 and acc_x > -4096 and acc_x < 4096: value = 2
-            elif acc_z < 8192 and acc_y < -8192 and acc_x > -4096 and acc_x < 4096: value = -2
-            elif acc_z > 12288 and acc_x > -8192 and acc_x < 8192 and acc_y > -8192 and acc_y < 8192: value = 3
-            elif acc_z < -12288 and acc_x > -4096 and acc_x < 4096 and acc_y > -4096 and acc_y < 4096: value = -3
-            else: value = 0
-            if value != self._event_tilt:
-                self._tilt_device._put(value, self._event_tilt != -4)
-                self._event_tilt = value
-            value = int(packet[28:30], 16)
-            if value == 0:
-                self._light = int(packet[30:34], 16)
-            else:
-                value = int(packet[30:32], 16)
-                if value > 0x7f: value -= 0x100
-                self._temperature = Util.round(value / 2.0 + 24)
-                value = (int(packet[32:34], 16) + 200) / 100.0
-                if value < 3.6: value = 0
-                elif value <= 3.7: value = 1
-                else: value = 2
-                if value != self._event_battery_state:
-                    self._battery_state_device._put(value, self._event_battery_state != -1)
-                    self._event_battery_state = value
-            self._light_device._put(self._light)
-            self._temperature_device._put(self._temperature)
-            value = int(packet[34:36], 16)
-            self._input_a_device._put(value)
-            value = int(packet[36:38], 16)
-            self._input_b_device._put(value)
-            value = int(packet[38:40], 16)
-            if (value & 0x40) != 0:
-                if self._line_tracer_event == 1:
-                    if value != 0x40:
-                        self._line_tracer_event = 2
-                if self._line_tracer_event == 2:
-                    if value != self._line_tracer_state:
-                        self._line_tracer_state = value
-                        self._line_tracer_state_device._put(value)
-                        if value == 0x40:
-                            self._line_tracer_event = 0
+        self._input_1_device._put(packet[2])
+        self._input_2_device._put(packet[3])
+        self._input_3_device._put(packet[4])
+        self._remoctl_device._put(packet[5])
+        self._battery_device._put(packet[6])
         return True
 
     def _receive(self, connector):
         if connector:
             packet = connector.read()
             if packet:
-                # if self._decode_sensory_packet(packet): # Temporary blocking
+                if self._decode_sensory_packet(packet):
                     if self._ready == False:
                         self._ready = True
                         Runner.register_checked()
                     self._notify_sensory_device_data_changed()
-                    return True
+                return True
         return False
 
     def _send(self, connector):

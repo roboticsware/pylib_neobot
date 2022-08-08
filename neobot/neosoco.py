@@ -28,6 +28,11 @@ class Neosoco(Robot):
     OUTPUT_1 = 0x00400000
     OUTPUT_2 = 0x00400001
     OUTPUT_3 = 0x00400002
+    INPUT_1  = 0x00400003
+    INPUT_2  = 0x00400004
+    INPUT_3  = 0x00400005
+    REMOCTL  = 0x00400006
+    BATTERY  = 0x00400007
 
     LED_OFF = 0
     LED_BLUE = 1
@@ -328,6 +333,40 @@ class Neosoco(Robot):
     def _notify_motoring_device_data_changed(self):
         self._roboid._notify_motoring_device_data_changed()
 
+    def led_on(self, port: str, brightness: str):
+        if isinstance(port, str) and isinstance(brightness, int):
+            if port.lower() =='out1':
+                self.write(Neosoco.OUTPUT_1, Util.round(brightness)) 
+            elif port.lower() =='out2':
+                self.write(Neosoco.OUTPUT_2, Util.round(brightness)) 
+            elif port.lower() =='out3':
+                self.write(Neosoco.OUTPUT_3, Util.round(brightness)) 
+            elif port.lower() =='all':
+                self.write(Neosoco.OUTPUT_1, Util.round(brightness)) 
+                self.write(Neosoco.OUTPUT_2, Util.round(brightness)) 
+                self.write(Neosoco.OUTPUT_3, Util.round(brightness))
+            else:
+                raise ValueError
+        else:
+            raise TypeError
+
+    def get_value(self, port: str):
+        if isinstance(port, str):
+            if port.lower() =='in1':
+                return self.read(Neosoco.INPUT_1)
+            elif port.lower() =='in2':
+                return self.read(Neosoco.INPUT_2)
+            elif port.lower() =='in3':
+                return self.read(Neosoco.INPUT_3)
+            elif port.lower() =='remo':
+                return self.read(Neosoco.REMOCTL)
+            elif port.lower() =='bat':
+                return self.read(Neosoco.BATTERY)
+            else:
+                raise ValueError
+        else:
+            raise TypeError
+
     def wheels(self, left_velocity, right_velocity=None):
         self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
         if isinstance(left_velocity, (int, float)):
@@ -579,21 +618,6 @@ class Neosoco(Robot):
         else:
             if isinstance(left_color, (int, float)):
                 self.write(Neosoco.RIGHT_LED, int(left_color))
-
-    def led_on(self, port: str, brightness: str):
-        if isinstance(port, str) and isinstance(brightness, int):
-            if port.lower() =='out1':
-                self.write(Neosoco.OUTPUT_1, Util.round(brightness)) 
-            elif port.lower() =='out2':
-                self.write(Neosoco.OUTPUT_2, Util.round(brightness)) 
-            elif port.lower() =='out3':
-                self.write(Neosoco.OUTPUT_3, Util.round(brightness)) 
-            elif port.lower() =='all':
-                self.write(Neosoco.OUTPUT_1, Util.round(brightness)) 
-                self.write(Neosoco.OUTPUT_2, Util.round(brightness)) 
-                self.write(Neosoco.OUTPUT_3, Util.round(brightness)) 
-        else:
-            raise TypeError
 
     def left_led(self, color):
         if isinstance(color, (int, float)):

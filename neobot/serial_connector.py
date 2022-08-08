@@ -66,8 +66,7 @@ class SerialConnector(object):
                     parity = serial.PARITY_NONE,
                     stopbits = serial.STOPBITS_ONE,
                     bytesize = serial.EIGHTBITS,
-                    # Number of serial commands to accept before timing out
-                    timeout=0.1, 
+                    timeout = 0.1, # Set a read timeout value in seconds
                 )
                 s.reset_input_buffer()
                 s.reset_output_buffer()
@@ -121,12 +120,12 @@ class SerialConnector(object):
                     bufferBytes = serial.inWaiting()
                     if bufferBytes:
                         line = c + serial.read(bufferBytes)
-                        print('Recv: ', line) # For debug, temporary
+                        print('Recv: ', line.hex()) # For debug, temporary
                         if line[:2] == start_byte: 
-                            return line
+                            return line[:VALID_PACKET_LENGTH]
                 else:
                     return ""
-        except:
+        except: # Port is closed
             return ""
 
     def _read_packet(self, serial, start_byte=None):

@@ -19,15 +19,15 @@
 import time
 import threading
 
-from neobot.runner import Runner
-from neobot.util import Util
-from neobot.model import DeviceType
-from neobot.model import DataType
-from neobot.model import Neobot
-from neobot.connector import Result
-from neobot.neosoco import Neosoco
-from neobot.serial_connector import SerialConnector
-from neobot.linker import Linker
+from neopia.runner import Runner
+from neopia.util import Util
+from neopia.model import DeviceType
+from neopia.model import DataType
+from neopia.model import Neobot
+from neopia.connector import Result
+from neopia.neosoco import Neosoco
+from neopia.serial_connector import SerialConnector
+from neopia.linker import Linker
 
 START_BYTES = 'CDAB'
 
@@ -115,7 +115,7 @@ class NeosocoNeobot(Neobot):
         self._model_code = code
 
     def _create_model(self):
-        from neobot.neosoco import Neosoco
+        from neopia.neosoco import Neosoco
         dict = self._device_dict = {}
         dict[Neosoco.OUTPUT_1] = self._output_1_device = self._add_device(Neosoco.OUTPUT_1, "Output1", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)
         dict[Neosoco.OUTPUT_2] = self._output_2_device = self._add_device(Neosoco.OUTPUT_2, "Output2", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 255, 0)

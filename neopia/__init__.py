@@ -18,13 +18,13 @@
 
 import signal
 
-from neobot.scanner import Scanner
-from neobot.mode import Mode
-from neobot.keyboard import Keyboard
-from neobot.runner import Runner
-from neobot.model import DeviceType
-from neobot.model import DataType
-from neobot.neosoco import Neosoco
+from neopia.scanner import Scanner
+from neopia.mode import Mode
+from neopia.keyboard import Keyboard
+from neopia.runner import Runner
+from neopia.model import DeviceType
+from neopia.model import DataType
+from neopia.neosoco import Neosoco
 
 __version__ = "0.1.0"
 

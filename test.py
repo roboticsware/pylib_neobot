@@ -1,4 +1,4 @@
-from neobot import *
+from neopia import *
 
 n =  Neosoco()
 

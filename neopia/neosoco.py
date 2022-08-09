@@ -19,10 +19,10 @@
 
 import time
 
-from neobot.runner import Runner
-from neobot.util import Util
-from neobot.model import Robot
-from neobot.mode import Mode
+from neopia.runner import Runner
+from neopia.util import Util
+from neopia.model import Robot
+from neopia.mode import Mode
 
 
 class Neosoco(Robot):
@@ -327,10 +327,10 @@ class Neosoco(Robot):
 
     def _init(self, port_name):
         if Mode.is_link_mode():
-            from neobot.neosoco_neobot import NeosocoLinkNeobot
+            from neopia.neosoco_neobot import NeosocoLinkNeobot
             self._roboid = NeosocoLinkNeobot(self.get_index())
         else:
-            from neobot.neosoco_neobot import NeosocoNeobot
+            from neopia.neosoco_neobot import NeosocoNeobot
             self._roboid = NeosocoNeobot(self.get_index())
         self._add_roboid(self._roboid)
         Runner.register_robot(self)

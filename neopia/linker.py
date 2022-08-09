@@ -22,8 +22,8 @@ import time
 from timeit import default_timer as timer
 import websocket
 import json
-from neobot.runner import Runner
-from neobot.connector import State
+from neopia.runner import Runner
+from neopia.connector import State
 
 
 class Link(object):

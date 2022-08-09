@@ -21,8 +21,8 @@ from timeit import default_timer as timer
 
 import serial.tools.list_ports
 
-from neobot.connector import State
-from neobot.connector import Result
+from neopia.connector import State
+from neopia.connector import Result
 
 
 BAUD_RATE = 115200

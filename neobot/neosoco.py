@@ -16,6 +16,9 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 # Boston, MA  02111-1307  USA
 
+
+import time
+
 from neobot.runner import Runner
 from neobot.util import Util
 from neobot.model import Robot
@@ -25,14 +28,16 @@ from neobot.mode import Mode
 class Neosoco(Robot):
     ID = "kr.neobot.physical.neosoco"
 
-    OUTPUT_1 = 0x00400000
-    OUTPUT_2 = 0x00400001
-    OUTPUT_3 = 0x00400002
-    INPUT_1  = 0x00400003
-    INPUT_2  = 0x00400004
-    INPUT_3  = 0x00400005
-    REMOCTL  = 0x00400006
-    BATTERY  = 0x00400007
+    OUTPUT_1    = 0x00400000
+    OUTPUT_2    = 0x00400001
+    OUTPUT_3    = 0x00400002
+    INPUT_1     = 0x00400003
+    INPUT_2     = 0x00400004
+    INPUT_3     = 0x00400005
+    REMOCTL     = 0x00400006
+    BATTERY     = 0x00400007
+    LEFT_MOTOR  = 0x00400008
+    RIGHT_MOTOR = 0x00400009
 
     LED_OFF = 0
     LED_BLUE = 1
@@ -280,6 +285,23 @@ class Neosoco(Robot):
         "digital_output": IO_MODE_DIGITAL_OUTPUT,
         "digital output": IO_MODE_DIGITAL_OUTPUT
     }
+    _MOTOR_PERCENT_CVT = { 
+        '100': 15,
+        '90': 14,
+        '80': 13,
+        '70': 12,
+        '60': 10,
+        '50': 9,
+        '40': 7,
+        '30': 5,
+        '20': 3,
+        '10': 2,
+        '0': 0
+    }
+    _MOTOR_DIR = { 
+        'forward': 16,
+        'backward': 32
+    }
     _robots = {}
 
     def __init__(self, index=0, port_name=None):
@@ -403,6 +425,30 @@ class Neosoco(Robot):
                 raise ValueError
         else:
             raise TypeError
+
+    def motor_move(self, direction: str):
+        if isinstance(direction, str):
+            if direction.lower() =='forward':
+                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
+                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
+            elif direction.lower() =='backward':
+                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
+                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
+            elif direction.lower() =='left':
+                self.write(Neosoco.LEFT_MOTOR, 0)
+                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
+            elif direction.lower() =='right':
+                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
+                self.write(Neosoco.RIGHT_MOTOR, 0)
+            elif direction.lower() =='stop':
+                self.write(Neosoco.LEFT_MOTOR, 0)
+                self.write(Neosoco.RIGHT_MOTOR, 0)
+            else:
+                Util.print_error('Wrong value of direction')
+                raise ValueError
+        else:
+            raise TypeError
+        time.sleep(0.1) # Since brocast from cotroller is per 100ms
 
     def wheels(self, left_velocity, right_velocity=None):
         self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)

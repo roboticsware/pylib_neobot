@@ -333,23 +333,6 @@ class Neosoco(Robot):
     def _notify_motoring_device_data_changed(self):
         self._roboid._notify_motoring_device_data_changed()
 
-    def led_on(self, port: str, brightness: str):
-        if isinstance(port, str) and isinstance(brightness, int):
-            if port.lower() =='out1':
-                self.write(Neosoco.OUTPUT_1, Util.round(brightness)) 
-            elif port.lower() =='out2':
-                self.write(Neosoco.OUTPUT_2, Util.round(brightness)) 
-            elif port.lower() =='out3':
-                self.write(Neosoco.OUTPUT_3, Util.round(brightness)) 
-            elif port.lower() =='all':
-                self.write(Neosoco.OUTPUT_1, Util.round(brightness)) 
-                self.write(Neosoco.OUTPUT_2, Util.round(brightness)) 
-                self.write(Neosoco.OUTPUT_3, Util.round(brightness))
-            else:
-                raise ValueError
-        else:
-            raise TypeError
-
     def get_value(self, port: str):
         if isinstance(port, str):
             if port.lower() =='in1':
@@ -363,6 +346,42 @@ class Neosoco(Robot):
             elif port.lower() =='bat':
                 return self.read(Neosoco.BATTERY)
             else:
+                Util.print_error('Wrong value of port')
+                raise ValueError
+        else:
+            raise TypeError
+
+    def led_on(self, port: str, brightness: str):
+        try:
+            cvt_dic = { 
+                '100': 255,
+                '90': 230,
+                '80': 204,
+                '70': 179,
+                '60': 153,
+                '50': 128,
+                '40': 102,
+                '30': 77,
+                '20': 51,
+                '10': 26
+            }
+            cvt_val = cvt_dic[brightness]
+        except KeyError:
+            Util.print_error('Wrong value of percentage')
+            raise ValueError
+        if isinstance(port, str):
+            if port.lower() =='out1':
+                self.write(Neosoco.OUTPUT_1, cvt_val) 
+            elif port.lower() =='out2':
+                self.write(Neosoco.OUTPUT_2, cvt_val) 
+            elif port.lower() =='out3':
+                self.write(Neosoco.OUTPUT_3, cvt_val) 
+            elif port.lower() =='all':
+                self.write(Neosoco.OUTPUT_1, cvt_val) 
+                self.write(Neosoco.OUTPUT_2, cvt_val) 
+                self.write(Neosoco.OUTPUT_3, cvt_val)
+            else:
+                Util.print_error('Wrong value of port')
                 raise ValueError
         else:
             raise TypeError

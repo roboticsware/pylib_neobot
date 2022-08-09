@@ -16,6 +16,7 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 # Boston, MA  02111-1307  USA
 
+import sys
 
 class Util(object):
     @staticmethod
@@ -27,3 +28,10 @@ class Util(object):
                 return int(0.5 + value)
         else:
             return 0
+    @staticmethod
+    def print_message(message):
+        sys.stdout.write("{}: {}\n".format('Debug', message))
+
+    @staticmethod
+    def print_error(message):
+        sys.stderr.write("{}: {}\n".format('Error', message))

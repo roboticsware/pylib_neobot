@@ -435,11 +435,11 @@ class Neosoco(Robot):
                 self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
                 self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
             elif direction.lower() =='left':
-                self.write(Neosoco.LEFT_MOTOR, 0)
+                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
                 self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
             elif direction.lower() =='right':
                 self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
-                self.write(Neosoco.RIGHT_MOTOR, 0)
+                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
             elif direction.lower() =='stop':
                 self.write(Neosoco.LEFT_MOTOR, 0)
                 self.write(Neosoco.RIGHT_MOTOR, 0)

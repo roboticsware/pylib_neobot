@@ -18,8 +18,23 @@ n =  Neosoco()
 #     n.set_value('out1', 0)
 
 # case4) Move forth and back during 1s and stop
-n.motor_move('forward')
-wait(500)
-n.motor_move('backward')
-wait(500)
-n.motor_move('stop')
+# n.motor_move('forward')
+# wait(500)
+# n.motor_move('backward')
+# wait(500)
+# n.motor_move('stop')
+
+# case5) Moving cotrol by direction keys on the keyboard
+while True:
+  key = Keyboard.read()
+
+  if key == Keyboard.UP:
+    n.motor_move('forward')
+  elif key == Keyboard.DOWN:
+    n.motor_move('backward')
+  elif key == Keyboard.LEFT:
+    n.motor_move('left')
+  elif key == Keyboard.RIGHT:
+    n.motor_move('right')
+  elif key == ' ':
+    n.motor_move('stop')

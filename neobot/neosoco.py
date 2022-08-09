@@ -333,6 +333,24 @@ class Neosoco(Robot):
     def _notify_motoring_device_data_changed(self):
         self._roboid._notify_motoring_device_data_changed()
 
+    def set_value(self, port: str, value: int):
+        if isinstance(port, str) and isinstance(value, int):
+            if port.lower() =='out1':
+                self.write(Neosoco.OUTPUT_1, Util.round(value)) 
+            elif port.lower() =='out2':
+                self.write(Neosoco.OUTPUT_2, Util.round(value)) 
+            elif port.lower() =='out3':
+                self.write(Neosoco.OUTPUT_3, Util.round(value)) 
+            elif port.lower() =='all':
+                self.write(Neosoco.OUTPUT_1, Util.round(value)) 
+                self.write(Neosoco.OUTPUT_2, Util.round(value)) 
+                self.write(Neosoco.OUTPUT_3, Util.round(value))
+            else:
+                Util.print_error('Wrong value of port')
+                raise ValueError
+        else:
+            raise TypeError
+
     def get_value(self, port: str):
         if isinstance(port, str):
             if port.lower() =='in1':

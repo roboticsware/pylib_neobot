@@ -40,11 +40,15 @@ n =  Neosoco()
 #     n.motor_move('stop')
 
 # case6) Play same note by pitch, sharp and flat, and a length of note
-n.buzzer('3', n.NOTE_NAME_C)
-n.buzzer('3', 'c')
+# n.buzzer('3', n.NOTE_NAME_C)
+# n.buzzer('3', 'c')
 
-n.buzzer('4', n.NOTE_NAME_C_SHARP, '8')
-n.buzzer('4', 'c#', '8')
+# n.buzzer('4', n.NOTE_NAME_C_SHARP, '8')
+# n.buzzer('4', 'c#', '8')
 
-n.buzzer('5', n.NOTE_NAME_D_FLAT, '16')
-n.buzzer('5', 'db', '16')
+# n.buzzer('5', n.NOTE_NAME_D_FLAT, '16')
+# n.buzzer('5', 'db', '16')
+
+# case7) Play a sound by value from input port
+while True:
+  n.buzzer_by_port('in1')

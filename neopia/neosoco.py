@@ -16,6 +16,7 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 # Boston, MA  02111-1307  USA
 
+import math
 
 from neopia.runner import Runner
 from neopia.util import Util
@@ -472,6 +473,26 @@ class Neosoco(Robot):
                         Runner.wait(tail)
             else:
                 raise ValueError('Wrong value of beats')
+
+    def buzzer_by_port(self, port='in1'):
+        if isinstance(port, str):
+            if port.lower() =='in1':
+                value = self.read(Neosoco.INPUT_1)
+            elif port.lower() =='in2':
+                value = self.read(Neosoco.INPUT_2)
+            elif port.lower() =='in3':
+                value = self.read(Neosoco.INPUT_3)
+            else:
+                raise ValueError('Wrong value of port')
+
+            if value:
+                # Map to 0~65 from 0~100, it's same as Entry
+                value = max(value, 0)
+                value = min(value, 100)
+                value = math.ceil(value / 100 * 65)
+                self.write(Neosoco.NOTE, value)
+        else:
+            raise TypeError
 
     def wheels(self, left_velocity, right_velocity=None):
         self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)

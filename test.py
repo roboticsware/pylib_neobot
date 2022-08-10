@@ -18,8 +18,15 @@ n =  Neosoco()
 #     n.led_off('out1')
 
 # case4) Move forth and back during 1s and stop
-n.motor_move('forward')
-wait(500)
-n.motor_move('backward')
-wait(500)
-n.motor_move('stop')
+# n.motor_move('forward')
+# wait(500)
+# n.motor_move('backward')
+# wait(500)
+# n.motor_move('stop')
+
+# case5) Turn on motor when the distance is under 10cm
+while True:
+  if n.get_value('in1') < 10:
+    n.motor_stop('both')
+  else:
+    n.motor_move('forward')

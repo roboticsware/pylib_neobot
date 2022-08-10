@@ -468,6 +468,22 @@ class Neosoco(Robot):
             raise TypeError
         time.sleep(0.1) # Since brocast from cotroller is per 100ms
 
+    def motor_stop(self, which_motor: str):
+        if isinstance(which_motor, str):
+            if which_motor.lower() =='right':
+                self.write(Neosoco.RIGHT_MOTOR, 0)
+            elif which_motor.lower() =='left':
+                self.write(Neosoco.LEFT_MOTOR, 0)
+            elif which_motor.lower() =='both':
+                self.write(Neosoco.LEFT_MOTOR, 0)
+                self.write(Neosoco.RIGHT_MOTOR, 0)
+            else:
+                Util.print_error('Wrong value of motor')
+                raise ValueError
+        else:
+            raise TypeError
+        time.sleep(0.1) # Since brocast from cotroller is per 100ms
+
     def wheels(self, left_velocity, right_velocity=None):
         self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
         if isinstance(left_velocity, (int, float)):

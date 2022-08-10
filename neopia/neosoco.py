@@ -17,8 +17,6 @@
 # Boston, MA  02111-1307  USA
 
 
-import time
-
 from neopia.runner import Runner
 from neopia.util import Util
 from neopia.model import Robot
@@ -466,7 +464,7 @@ class Neosoco(Robot):
                 raise ValueError
         else:
             raise TypeError
-        time.sleep(0.1) # Since brocast from cotroller is per 100ms
+        Runner.wait(100) # Since broadcast from controller is per 100ms
 
     def wheels(self, left_velocity, right_velocity=None):
         self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)

@@ -24,7 +24,25 @@ n =  Neosoco()
 # wait(500)
 # n.motor_move('stop')
 
-# case5) Turn on motor when the distance is under 10cm
+
+
+# case5) Moving cotrol by direction keys on the keyboard
+# while True:
+#   key = Keyboard.read()
+# 
+#   if key == Keyboard.UP:
+#     n.motor_move('forward')
+#   elif key == Keyboard.DOWN:
+#     n.motor_move('backward')
+#   elif key == Keyboard.LEFT:
+#     n.motor_move('left')
+#   elif key == Keyboard.RIGHT:
+#     n.motor_move('right')
+#   elif key == ' ':
+#     n.motor_move('stop')
+
+
+# case6) Turn on motor when the distance is under 10cm
 while True:
   if n.get_value('in1') < 10:
     n.motor_stop('both')

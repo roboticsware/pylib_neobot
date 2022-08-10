@@ -426,6 +426,24 @@ class Neosoco(Robot):
         else:
             raise TypeError
 
+    def led_off(self, port: str):
+        if isinstance(port, str):
+            if port.lower() =='out1':
+                self.write(Neosoco.OUTPUT_1, 0) 
+            elif port.lower() =='out2':
+                self.write(Neosoco.OUTPUT_2, 0) 
+            elif port.lower() =='out3':
+                self.write(Neosoco.OUTPUT_3, 0) 
+            elif port.lower() =='all':
+                self.write(Neosoco.OUTPUT_1, 0) 
+                self.write(Neosoco.OUTPUT_2, 0) 
+                self.write(Neosoco.OUTPUT_3, 0)
+            else:
+                Util.print_error('Wrong value of port')
+                raise ValueError
+        else:
+            raise TypeError
+
     def motor_move(self, direction: str):
         if isinstance(direction, str):
             if direction.lower() =='forward':

@@ -15,7 +15,7 @@ n =  Neosoco()
 #   if n.get_value('in1') < 10:
 #     n.led_on('out1', '100')
 #   else:
-#     n.set_value('out1', 0)
+#     n.led_off('out1')
 
 # case4) Move forth and back during 1s and stop
 # n.motor_move('forward')

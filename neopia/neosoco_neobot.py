@@ -127,6 +127,7 @@ class NeosocoNeobot(Neobot):
         dict[Neosoco.BATTERY] = self._battery_device = self._add_device(Neosoco.BATTERY, "Battery", DeviceType.SENSOR, DataType.INTEGER, 1, 0, 255, 0)
         dict[Neosoco.LEFT_MOTOR] = self._left_motor_device = self._add_device(Neosoco.LEFT_MOTOR, "LeftMotor", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 47, 0)
         dict[Neosoco.RIGHT_MOTOR] = self._right_motor_device = self._add_device(Neosoco.RIGHT_MOTOR, "RightMotor", DeviceType.EFFECTOR, DataType.INTEGER, 1, 0, 47, 0)
+        dict[Neosoco.NOTE] = self._note_device = self._add_device(Neosoco.NOTE, "Note", DeviceType.COMMAND, DataType.INTEGER, 1, 0, 72, 0)
 
     def find_device_by_id(self, device_id):
         return self._device_dict.get(device_id)
@@ -231,6 +232,7 @@ class NeosocoNeobot(Neobot):
             self._output_3 = self._output_3_device.read()
             self._left_motor = self._left_motor_device.read()
             self._right_motor = self._right_motor_device.read()
+            self._note = self._note_device.read()
         self._clear_written()
 
     def _color_to_rgb(self, color):
@@ -258,7 +260,7 @@ class NeosocoNeobot(Neobot):
             result += self._to_hex(self._output_3) # OUT3
             result += self._to_hex(self._left_motor)  # MLA
             result += self._to_hex(self._right_motor) # MRA
-            result += self._to_hex(0) # BUZZER
+            result += self._to_hex(self._note) # BUZZER
             result += self._to_hex(0) # FND
             result += self._to_hex(0) # Not Used
             result += self._to_hex(self._make_checksum(result)) # Checksum

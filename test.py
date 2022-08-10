@@ -25,16 +25,26 @@ n =  Neosoco()
 # n.motor_move('stop')
 
 # case5) Moving cotrol by direction keys on the keyboard
-while True:
-  key = Keyboard.read()
+# while True:
+#   key = Keyboard.read()
 
-  if key == Keyboard.UP:
-    n.motor_move('forward')
-  elif key == Keyboard.DOWN:
-    n.motor_move('backward')
-  elif key == Keyboard.LEFT:
-    n.motor_move('left')
-  elif key == Keyboard.RIGHT:
-    n.motor_move('right')
-  elif key == ' ':
-    n.motor_move('stop')
+#   if key == Keyboard.UP:
+#     n.motor_move('forward')
+#   elif key == Keyboard.DOWN:
+#     n.motor_move('backward')
+#   elif key == Keyboard.LEFT:
+#     n.motor_move('left')
+#   elif key == Keyboard.RIGHT:
+#     n.motor_move('right')
+#   elif key == ' ':
+#     n.motor_move('stop')
+
+# case6) Play same note by pitch, sharp and flat, and a length of note
+n.buzzer('3', n.NOTE_NAME_C)
+n.buzzer('3', 'c')
+
+n.buzzer('4', n.NOTE_NAME_C_SHARP, '8')
+n.buzzer('4', 'c#', '8')
+
+n.buzzer('5', n.NOTE_NAME_D_FLAT, '16')
+n.buzzer('5', 'db', '16')

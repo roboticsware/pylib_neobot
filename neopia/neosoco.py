@@ -36,6 +36,7 @@ class Neosoco(Robot):
     BATTERY     = 0x00400007
     LEFT_MOTOR  = 0x00400008
     RIGHT_MOTOR = 0x00400009
+    NOTE        = 0x0040000a
 
     LED_OFF = 0
     LED_BLUE = 1
@@ -85,132 +86,110 @@ class Neosoco(Robot):
     IO_MODE_NAME_PWM_OUTPUT = "pwm output"
     IO_MODE_NAME_DIGITAL_OUTPUT = "digital output"
 
-    NOTE_OFF = 0
-    NOTE_A_0 = 1
-    NOTE_A_SHARP_0 = 2
-    NOTE_B_FLAT_0 = 2
-    NOTE_B_0 = 3
-    NOTE_C_1 = 4
-    NOTE_C_SHARP_1 = 5
-    NOTE_D_FLAT_1 = 5
-    NOTE_D_1 = 6
-    NOTE_D_SHARP_1 = 7
-    NOTE_E_FLAT_1 = 7
-    NOTE_E_1 = 8
-    NOTE_F_1 = 9
-    NOTE_F_SHARP_1 = 10
-    NOTE_G_FLAT_1 = 10
-    NOTE_G_1 = 11
-    NOTE_G_SHARP_1 = 12
-    NOTE_A_FLAT_1 = 12
-    NOTE_A_1 = 13
-    NOTE_A_SHARP_1 = 14
-    NOTE_B_FLAT_1 = 14
-    NOTE_B_1 = 15
-    NOTE_C_2 = 16
-    NOTE_C_SHARP_2 = 17
-    NOTE_D_FLAT_2 = 17
-    NOTE_D_2 = 18
-    NOTE_D_SHARP_2 = 19
-    NOTE_E_FLAT_2 = 19
-    NOTE_E_2 = 20
-    NOTE_F_2 = 21
-    NOTE_F_SHARP_2 = 22
-    NOTE_G_FLAT_2 = 22
-    NOTE_G_2 = 23
-    NOTE_G_SHARP_2 = 24
-    NOTE_A_FLAT_2 = 24
-    NOTE_A_2 = 25
-    NOTE_A_SHARP_2 = 26
-    NOTE_B_FLAT_2 = 26
-    NOTE_B_2 = 27
-    NOTE_C_3 = 28
-    NOTE_C_SHARP_3 = 29
-    NOTE_D_FLAT_3 = 29
-    NOTE_D_3 = 30
-    NOTE_D_SHARP_3 = 31
-    NOTE_E_FLAT_3 = 31
-    NOTE_E_3 = 32
-    NOTE_F_3 = 33
-    NOTE_F_SHARP_3 = 34
-    NOTE_G_FLAT_3 = 34
-    NOTE_G_3 = 35
-    NOTE_G_SHARP_3 = 36
-    NOTE_A_FLAT_3 = 36
-    NOTE_A_3 = 37
-    NOTE_A_SHARP_3 = 38
-    NOTE_B_FLAT_3 = 38
-    NOTE_B_3 = 39
-    NOTE_C_4 = 40
-    NOTE_C_SHARP_4 = 41
-    NOTE_D_FLAT_4 = 41
-    NOTE_D_4 = 42
-    NOTE_D_SHARP_4 = 43
-    NOTE_E_FLAT_4 = 43
-    NOTE_E_4 = 44
-    NOTE_F_4 = 45
-    NOTE_F_SHARP_4 = 46
-    NOTE_G_FLAT_4 = 46
-    NOTE_G_4 = 47
-    NOTE_G_SHARP_4 = 48
-    NOTE_A_FLAT_4 = 48
-    NOTE_A_4 = 49
-    NOTE_A_SHARP_4 = 50
-    NOTE_B_FLAT_4 = 50
-    NOTE_B_4 = 51
-    NOTE_C_5 = 52
-    NOTE_C_SHARP_5 = 53
-    NOTE_D_FLAT_5 = 53
-    NOTE_D_5 = 54
-    NOTE_D_SHARP_5 = 55
-    NOTE_E_FLAT_5 = 55
-    NOTE_E_5 = 56
-    NOTE_F_5 = 57
-    NOTE_F_SHARP_5 = 58
-    NOTE_G_FLAT_5 = 58
-    NOTE_G_5 = 59
-    NOTE_G_SHARP_5 = 60
-    NOTE_A_FLAT_5 = 60
-    NOTE_A_5 = 61
-    NOTE_A_SHARP_5 = 62
-    NOTE_B_FLAT_5 = 62
-    NOTE_B_5 = 63
-    NOTE_C_6 = 64
-    NOTE_C_SHARP_6 = 65
-    NOTE_D_FLAT_6 = 65
-    NOTE_D_6 = 66
-    NOTE_D_SHARP_6 = 67
-    NOTE_E_FLAT_6 = 67
-    NOTE_E_6 = 68
-    NOTE_F_6 = 69
-    NOTE_F_SHARP_6 = 70
-    NOTE_G_FLAT_6 = 70
-    NOTE_G_6 = 71
-    NOTE_G_SHARP_6 = 72
-    NOTE_A_FLAT_6 = 72
-    NOTE_A_6 = 73
-    NOTE_A_SHARP_6 = 74
-    NOTE_B_FLAT_6 = 74
-    NOTE_B_6 = 75
-    NOTE_C_7 = 76
-    NOTE_C_SHARP_7 = 77
-    NOTE_D_FLAT_7 = 77
-    NOTE_D_7 = 78
-    NOTE_D_SHARP_7 = 79
-    NOTE_E_FLAT_7 = 79
-    NOTE_E_7 = 80
-    NOTE_F_7 = 81
-    NOTE_F_SHARP_7 = 82
-    NOTE_G_FLAT_7 = 82
-    NOTE_G_7 = 83
-    NOTE_G_SHARP_7 = 84
-    NOTE_A_FLAT_7 = 84
-    NOTE_A_7 = 85
-    NOTE_A_SHARP_7 = 86
-    NOTE_B_FLAT_7 = 86
-    NOTE_B_7 = 87
-    NOTE_C_8 = 88
-
+    _NOTE_OFF = 0
+    _NOTE_C_1 = 1
+    _NOTE_C_SHARP_1 = 2
+    _NOTE_D_FLAT_1 = 2
+    _NOTE_D_1 = 3
+    _NOTE_D_SHARP_1 = 4
+    _NOTE_E_FLAT_1 = 4
+    _NOTE_E_1 = 5
+    _NOTE_F_1 = 6
+    _NOTE_F_SHARP_1 = 7
+    _NOTE_G_FLAT_1 = 7
+    _NOTE_G_1 = 8
+    _NOTE_G_SHARP_1 = 9
+    _NOTE_A_FLAT_1 = 9
+    _NOTE_A_1 = 10
+    _NOTE_A_SHARP_1 = 11
+    _NOTE_B_FLAT_1 = 11
+    _NOTE_B_1 = 12
+    _NOTE_C_2 = 13
+    _NOTE_C_SHARP_2 = 14
+    _NOTE_D_FLAT_2 = 14
+    _NOTE_D_2 = 15
+    _NOTE_D_SHARP_2 = 16
+    _NOTE_E_FLAT_2 = 16
+    _NOTE_E_2 = 17
+    _NOTE_F_2 = 18
+    _NOTE_F_SHARP_2 = 19
+    _NOTE_G_FLAT_2 = 19
+    _NOTE_G_2 = 20
+    _NOTE_G_SHARP_2 = 21
+    _NOTE_A_FLAT_2 = 21
+    _NOTE_A_2 = 22
+    _NOTE_A_SHARP_2 = 23
+    _NOTE_B_FLAT_2 = 23
+    _NOTE_B_2 = 24
+    _NOTE_C_3 = 25
+    _NOTE_C_SHARP_3 = 26
+    _NOTE_D_FLAT_3 = 26
+    _NOTE_D_3 = 27
+    _NOTE_D_SHARP_3 = 28
+    _NOTE_E_FLAT_3 = 28
+    _NOTE_E_3 = 29
+    _NOTE_F_3 = 30
+    _NOTE_F_SHARP_3 = 31
+    _NOTE_G_FLAT_3 = 31
+    _NOTE_G_3 = 32
+    _NOTE_G_SHARP_3 = 33
+    _NOTE_A_FLAT_3 = 33
+    _NOTE_A_3 = 34
+    _NOTE_A_SHARP_3 = 35
+    _NOTE_B_FLAT_3 = 35
+    _NOTE_B_3 = 36
+    _NOTE_C_4 = 37
+    _NOTE_C_SHARP_4 = 38
+    _NOTE_D_FLAT_4 = 38
+    _NOTE_D_4 = 39
+    _NOTE_D_SHARP_4 = 40
+    _NOTE_E_FLAT_4 = 40
+    _NOTE_E_4 = 41
+    _NOTE_F_4 = 42
+    _NOTE_F_SHARP_4 = 43
+    _NOTE_G_FLAT_4 = 43
+    _NOTE_G_4 = 44
+    _NOTE_G_SHARP_4 = 45
+    _NOTE_A_FLAT_4 = 45
+    _NOTE_A_4 = 46
+    _NOTE_A_SHARP_4 = 47
+    _NOTE_B_FLAT_4 = 47
+    _NOTE_B_4 = 48
+    _NOTE_C_5 = 49
+    _NOTE_C_SHARP_5 = 50
+    _NOTE_D_FLAT_5 = 50
+    _NOTE_D_5 = 51
+    _NOTE_D_SHARP_5 = 52
+    _NOTE_E_FLAT_5 = 52
+    _NOTE_E_5 = 53
+    _NOTE_F_5 = 54
+    _NOTE_F_SHARP_5 = 55
+    _NOTE_G_FLAT_5 = 55
+    _NOTE_G_5 = 56
+    _NOTE_G_SHARP_5 = 57
+    _NOTE_A_FLAT_5 = 57
+    _NOTE_A_5 = 58
+    _NOTE_A_SHARP_5 = 59
+    _NOTE_B_FLAT_5 = 59
+    _NOTE_B_5 = 60
+    _NOTE_C_6 = 61
+    _NOTE_C_SHARP_6 = 62
+    _NOTE_D_FLAT_6 = 62
+    _NOTE_D_6 = 63
+    _NOTE_D_SHARP_6 = 64
+    _NOTE_E_FLAT_6 = 64
+    _NOTE_E_6 = 65
+    _NOTE_F_6 = 66
+    _NOTE_F_SHARP_6 = 67
+    _NOTE_G_FLAT_6 = 67
+    _NOTE_G_6 = 68
+    _NOTE_G_SHARP_6 = 69
+    _NOTE_A_FLAT_6 = 69
+    _NOTE_A_6 = 70
+    _NOTE_A_SHARP_6 = 71
+    _NOTE_B_FLAT_6 = 71
+    _NOTE_B_6 = 72
+    
     NOTE_NAME_C = "C"
     NOTE_NAME_C_SHARP = "C#"
     NOTE_NAME_D_FLAT = "Db"
@@ -253,23 +232,24 @@ class Neosoco(Robot):
         "white": LED_WHITE
     }
     _NOTES = {
-        "c": NOTE_C_1,
-        "c#": NOTE_C_SHARP_1,
-        "db": NOTE_D_FLAT_1,
-        "d": NOTE_D_1,
-        "d#": NOTE_D_SHARP_1,
-        "eb": NOTE_E_FLAT_1,
-        "e": NOTE_E_1,
-        "f": NOTE_F_1,
-        "f#": NOTE_F_SHARP_1,
-        "gb": NOTE_G_FLAT_1,
-        "g": NOTE_G_1,
-        "g#": NOTE_G_SHARP_1,
-        "ab": NOTE_A_FLAT_1,
-        "a": NOTE_A_1,
-        "a#": NOTE_A_SHARP_1,
-        "bb": NOTE_B_FLAT_1,
-        "b": NOTE_B_1
+        0: _NOTE_OFF,
+        "c": _NOTE_C_1,
+        "c#": _NOTE_C_SHARP_1,
+        "db": _NOTE_D_FLAT_1,
+        "d": _NOTE_D_1,
+        "d#": _NOTE_D_SHARP_1,
+        "eb": _NOTE_E_FLAT_1,
+        "e": _NOTE_E_1,
+        "f": _NOTE_F_1,
+        "f#": _NOTE_F_SHARP_1,
+        "gb": _NOTE_G_FLAT_1,
+        "g": _NOTE_G_1,
+        "g#": _NOTE_G_SHARP_1,
+        "ab": _NOTE_A_FLAT_1,
+        "a": _NOTE_A_1,
+        "a#": _NOTE_A_SHARP_1,
+        "bb": _NOTE_B_FLAT_1,
+        "b": _NOTE_B_1
     }
     _IO_MODES = {
         "analog_input": IO_MODE_ANALOG_INPUT,
@@ -353,7 +333,7 @@ class Neosoco(Robot):
     def _notify_motoring_device_data_changed(self):
         self._roboid._notify_motoring_device_data_changed()
 
-    def set_value(self, port: str, value: int):
+    def set_value(self, port='out1', value=255):
         if isinstance(port, str) and isinstance(value, int):
             if port.lower() =='out1':
                 self.write(Neosoco.OUTPUT_1, Util.round(value)) 
@@ -366,12 +346,11 @@ class Neosoco(Robot):
                 self.write(Neosoco.OUTPUT_2, Util.round(value)) 
                 self.write(Neosoco.OUTPUT_3, Util.round(value))
             else:
-                Util.print_error('Wrong value of port')
-                raise ValueError
+                raise ValueError('Wrong value of port')
         else:
             raise TypeError
 
-    def get_value(self, port: str):
+    def get_value(self, port='in1'):
         if isinstance(port, str):
             if port.lower() =='in1':
                 return self.read(Neosoco.INPUT_1)
@@ -384,29 +363,27 @@ class Neosoco(Robot):
             elif port.lower() =='bat':
                 return self.read(Neosoco.BATTERY)
             else:
-                Util.print_error('Wrong value of port')
-                raise ValueError
+                raise ValueError('Wrong value of port')
         else:
             raise TypeError
 
-    def led_on(self, port: str, brightness: str):
-        try:
-            cvt_dic = { 
-                '100': 255,
-                '90': 230,
-                '80': 204,
-                '70': 179,
-                '60': 153,
-                '50': 128,
-                '40': 102,
-                '30': 77,
-                '20': 51,
-                '10': 26
-            }
+    def led_on(self, port='out1', brightness='100'):
+        cvt_dic = { 
+            '100': 255,
+            '90': 230,
+            '80': 204,
+            '70': 179,
+            '60': 153,
+            '50': 128,
+            '40': 102,
+            '30': 77,
+            '20': 51,
+            '10': 26
+        }
+        if brightness in cvt_dic.keys():
             cvt_val = cvt_dic[brightness]
-        except KeyError:
-            Util.print_error('Wrong value of percentage')
-            raise ValueError
+        else:
+            raise ValueError('Wrong value of percentage')
         if isinstance(port, str):
             if port.lower() =='out1':
                 self.write(Neosoco.OUTPUT_1, cvt_val) 
@@ -419,12 +396,11 @@ class Neosoco(Robot):
                 self.write(Neosoco.OUTPUT_2, cvt_val) 
                 self.write(Neosoco.OUTPUT_3, cvt_val)
             else:
-                Util.print_error('Wrong value of port')
-                raise ValueError
+                raise ValueError('Wrong value of port')
         else:
             raise TypeError
 
-    def led_off(self, port: str):
+    def led_off(self, port='port1'):
         if isinstance(port, str):
             if port.lower() =='out1':
                 self.write(Neosoco.OUTPUT_1, 0) 
@@ -437,12 +413,11 @@ class Neosoco(Robot):
                 self.write(Neosoco.OUTPUT_2, 0) 
                 self.write(Neosoco.OUTPUT_3, 0)
             else:
-                Util.print_error('Wrong value of port')
-                raise ValueError
+                raise ValueError('Wrong value of port')
         else:
             raise TypeError
 
-    def motor_move(self, direction: str):
+    def motor_move(self, direction='forward'):
         if isinstance(direction, str):
             if direction.lower() =='forward':
                 self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
@@ -460,11 +435,43 @@ class Neosoco(Robot):
                 self.write(Neosoco.LEFT_MOTOR, 0)
                 self.write(Neosoco.RIGHT_MOTOR, 0)
             else:
-                Util.print_error('Wrong value of direction')
-                raise ValueError
+                raise ValueError('Wrong value of direction')
         else:
             raise TypeError
         Runner.wait(100) # Since broadcast from controller is per 100ms
+
+    def buzzer(self, pitch='3', note='c', beats='4'):
+        self.write(Neosoco.NOTE, 0) # init
+        if not isinstance(pitch, str) or not (int(pitch) >= 1 and int(pitch) <= 6):
+            raise ValueError('Wrong value of pitch')
+        if note != 0 and not note.lower() in Neosoco._NOTES.keys():
+            raise ValueError('Wrong value of note')
+        else:
+            pitch = Neosoco._NOTES[note.lower()] + (int(pitch) - 1) * 12
+        if isinstance(pitch, (int, float)):
+            cvt_dic = {
+                '2': 1,
+                '4': 0.5,
+                '8': 0.25,
+                '16': 0.125
+            }
+            if beats in cvt_dic.keys():
+                bpm = self._bpm # default 60
+                if note == 0:
+                    self.write(Neosoco.NOTE, Neosoco._NOTE_OFF)
+                    Runner.wait(cvt_dic[beats] * 60 * 1000.0 / bpm)
+                else:
+                    timeout = cvt_dic[beats] * 60 * 1000.0 / bpm
+                    tail = 0
+                    if timeout > 100:
+                        tail = 100
+                    self.write(Neosoco.NOTE, pitch)
+                    Runner.wait(timeout - tail)
+                    self.write(Neosoco.NOTE, Neosoco._NOTE_OFF)
+                    if tail > 0:
+                        Runner.wait(tail)
+            else:
+                raise ValueError('Wrong value of beats')
 
     def wheels(self, left_velocity, right_velocity=None):
         self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
@@ -740,11 +747,6 @@ class Neosoco(Robot):
         Runner.wait(100)
         self.write(Neosoco.BUZZER, 0)
         Runner.wait(100)
-
-    def buzzer(self, hz):
-        self.write(Neosoco.NOTE, Neosoco.NOTE_OFF)
-        if isinstance(hz, (int, float)):
-            self.write(Neosoco.BUZZER, hz)
 
     def tempo(self, bpm):
         if isinstance(bpm, (int, float)):

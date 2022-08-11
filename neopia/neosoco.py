@@ -368,6 +368,37 @@ class Neosoco(Robot):
         else:
             raise TypeError
 
+    def convert_scale(self, port='in1', omin=0, omax=255, tmin=0, tmax=100):
+        if isinstance(port, str):
+            if port.lower() =='in1':
+                value = self.read(Neosoco.INPUT_1)
+            elif port.lower() =='in2':
+                value = self.read(Neosoco.INPUT_2)
+            elif port.lower() =='in3':
+                value = self.read(Neosoco.INPUT_3)
+            else:
+                raise ValueError('Wrong value of port')
+            if isinstance(omin, (int, float)) and isinstance(omax, (int, float)) and \
+                isinstance(tmin, (int, float)) and isinstance(tmax, (int, float)):
+                if omin > omax:
+                    temp = omin
+                    omin = omax
+                    omax = temp
+                if tmin > tmax:
+                    temp = tmin
+                    tmin = tmax
+                    tmax = temp
+                value -= omin
+                value = value * ((tmax - tmin) / (omax - omin))
+                value += tmin
+                value = min(tmax, value)
+                value = max(tmin, value)
+                return Util.round(value)
+            else:
+                raise TypeError
+        else:
+            raise TypeError
+
     def led_on(self, port='out1', brightness='100'):
         cvt_dic = { 
             '100': 255,

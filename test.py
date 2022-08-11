@@ -50,5 +50,9 @@ n =  Neosoco()
 # n.buzzer('5', 'db', '16')
 
 # case7) Play a sound by value from input port
-while True:
-  n.buzzer_by_port('in1')
+# while True:
+  # n.buzzer_by_port('in1')
+  
+# case8) Color LED on with variable color by input port
+# r = g = b = n.convert_scale('in1', 0, 255, 85, 170) # Limit to middle brightness
+# color_led_on('out1', r, g, b)

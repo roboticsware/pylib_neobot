@@ -17,14 +17,14 @@ n =  Neosoco()
 #   else:
 #     n.led_off('out1')
 
-# case4) Move forth and back during 1s and stop
+# case4-1) Move forth and back during 1s and stop
 # n.motor_move('forward')
 # wait(500)
 # n.motor_move('backward')
 # wait(500)
 # n.motor_move('stop')
 
-# case5) Moving cotrol by direction keys on the keyboard
+# case4-2) Moving control by direction keys on the keyboard
 # while True:
 #   key = Keyboard.read()
 
@@ -39,6 +39,13 @@ n =  Neosoco()
 #   elif key == ' ':
 #     n.motor_move('stop')
 
+# case5) Move forth and back with speed 30% during 1s and stop
+n.motor_rotate('both', 'forward', '30')
+wait(500)
+n.motor_rotate('both', 'backward', '30')
+wait(500)
+n.motor_move('stop')
+
 # case6) Play same note by pitch, sharp and flat, and a length of note
 # n.buzzer('3', n.NOTE_NAME_C)
 # n.buzzer('3', 'c')
@@ -51,7 +58,7 @@ n =  Neosoco()
 
 # case7) Play a sound by value from input port
 # while True:
-  # n.buzzer_by_port('in1')
+#   n.buzzer_by_port('in1')
   
 # case8) Color LED on with variable color by input port
 # r = g = b = n.convert_scale('in1', 0, 255, 85, 170) # Limit to middle brightness

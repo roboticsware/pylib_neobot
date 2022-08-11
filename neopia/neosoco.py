@@ -400,7 +400,7 @@ class Neosoco(Robot):
             raise TypeError
 
     def led_on(self, port='out1', brightness='100'):
-        cvt_dic = { 
+        percent_cvt = {
             '100': 255,
             '90': 230,
             '80': 204,
@@ -412,8 +412,8 @@ class Neosoco(Robot):
             '20': 51,
             '10': 26
         }
-        if brightness in cvt_dic.keys():
-            cvt_val = cvt_dic[brightness]
+        if brightness in percent_cvt.keys():
+            cvt_val = percent_cvt[brightness]
         else:
             raise ValueError('Wrong value of percentage')
         if isinstance(port, str):
@@ -451,18 +451,19 @@ class Neosoco(Robot):
 
     def motor_move(self, direction='forward'):
         if isinstance(direction, str):
+            speed = self._MOTOR_PERCENT_CVT['60']
             if direction.lower() =='forward':
-                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
-                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
+                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['forward']+speed)
+                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['forward']+speed)
             elif direction.lower() =='backward':
-                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
-                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
+                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['backward']+speed)
+                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['backward']+speed)
             elif direction.lower() =='left':
-                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
-                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
+                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['backward']+speed)
+                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['forward']+speed)
             elif direction.lower() =='right':
-                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['forward']+self._MOTOR_PERCENT_CVT['60'])
-                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['backward']+self._MOTOR_PERCENT_CVT['60'])
+                self.write(Neosoco.LEFT_MOTOR, self._MOTOR_DIR['forward']+speed)
+                self.write(Neosoco.RIGHT_MOTOR, self._MOTOR_DIR['backward']+speed)
             elif direction.lower() =='stop':
                 self.write(Neosoco.LEFT_MOTOR, 0)
                 self.write(Neosoco.RIGHT_MOTOR, 0)
@@ -471,6 +472,59 @@ class Neosoco(Robot):
         else:
             raise TypeError
         Runner.wait(100) # Since broadcast from controller is per 100ms
+
+    def _convert_input_port_scale(self, port, limit_val):
+        if port.lower() =='in1':
+            value = self.read(Neosoco.INPUT_1)
+        elif port.lower() =='in2':
+            value = self.read(Neosoco.INPUT_2)
+        elif port.lower() =='in3':
+            value = self.read(Neosoco.INPUT_3)
+        else:
+            raise ValueError('Wrong value of port')
+
+        if value:
+            value = max(value, 0)
+            value = min(value, 100)
+            value = math.ceil(value / 100 * limit_val)
+            return value
+
+    def motor_rotate(self, motor='both', direction='forward', speed='100'):
+        if isinstance(motor, str) and isinstance(direction, str) and isinstance(speed, str):
+            if speed == 'in1' or speed == 'in2' or speed == 'in3' :
+                # Map to 0~15 from 0~100(max), it's same as Entry
+                speed = self._convert_input_port_scale(speed, 15)
+            elif speed in self._MOTOR_PERCENT_CVT.keys():
+                speed = self._MOTOR_PERCENT_CVT[speed]
+            else:
+                raise ValueError('Wrong value of speed')
+
+            if direction.lower() =='forward':
+                l_direction = self._MOTOR_DIR['forward']
+                r_direction = self._MOTOR_DIR['forward']
+            elif direction.lower() =='backward':
+                l_direction = self._MOTOR_DIR['backward']
+                r_direction = self._MOTOR_DIR['backward']
+            elif direction.lower() =='left':
+                l_direction = self._MOTOR_DIR['backward']
+                r_direction = self._MOTOR_DIR['forward']
+            elif direction.lower() =='right':
+                l_direction = self._MOTOR_DIR['forward']
+                r_direction = self._MOTOR_DIR['backward']
+            else:
+                raise ValueError('Wrong value of direction')
+
+            if motor.lower() == 'both':
+                self.write(Neosoco.LEFT_MOTOR, l_direction + speed)
+                self.write(Neosoco.RIGHT_MOTOR, r_direction + speed)
+            elif motor.lower() == 'left':
+                self.write(Neosoco.LEFT_MOTOR, l_direction + speed)
+            elif motor.lower() == 'right':
+                self.write(Neosoco.RIGHT_MOTOR, r_direction + speed)
+            else:
+                raise ValueError('Wrong value of motor')
+        else:
+            raise TypeError
 
     def buzzer(self, pitch='3', note='c', beats='4'):
         self.write(Neosoco.NOTE, 0) # init
@@ -507,21 +561,9 @@ class Neosoco(Robot):
 
     def buzzer_by_port(self, port='in1'):
         if isinstance(port, str):
-            if port.lower() =='in1':
-                value = self.read(Neosoco.INPUT_1)
-            elif port.lower() =='in2':
-                value = self.read(Neosoco.INPUT_2)
-            elif port.lower() =='in3':
-                value = self.read(Neosoco.INPUT_3)
-            else:
-                raise ValueError('Wrong value of port')
-
-            if value:
-                # Map to 0~65 from 0~100, it's same as Entry
-                value = max(value, 0)
-                value = min(value, 100)
-                value = math.ceil(value / 100 * 65)
-                self.write(Neosoco.NOTE, value)
+            # Map to 0~65 from 0~100(max), it's same as Entry
+            value = self._convert_input_port_scale(port, 65)
+            self.write(Neosoco.NOTE, value)
         else:
             raise TypeError
 

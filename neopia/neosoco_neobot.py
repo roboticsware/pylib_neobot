@@ -1,4 +1,4 @@
-# Part of the ROBOID project - https://roboticsware.uz
+# Part of the RoboticsWare project - https://roboticsware.uz
 # Copyright (C) 2022 RoboticsWare (neopia.uz@gmail.com)
 # 
 # This library is free software; you can redistribute it and/or
@@ -34,14 +34,14 @@ START_BYTES = 'CDAB'
 
 class NeosocoConnectionChecker(object):
     def __init__(self, neobot):
-        self._roboid = neobot
+        self._neobot = neobot
 
     def check(self, info):
-        if info[1] == "Neosoco" and info[2] == "04":
-            self._roboid._set_model_code(0x04)
+        if info[1] == "Hamster" and info[2] == "04":
+            self._neobot._set_model_code(0x04)
             return True
         elif info[2] == "0E":
-            self._roboid._set_model_code(0x0E)
+            self._neobot._set_model_code(0x0E)
             return True
         else:
             return False
@@ -79,35 +79,12 @@ class NeosocoNeobot(Neobot):
         self._thread = None
         self._thread_lock = threading.Lock()
 
-        self._output1 = 0
-        self._output2 = 0
-        self._output3 = 0
-        self._mla = 0
-        self._mra = 0
-        self._buzzer = 0
-
-        self._topology_written = False
-        self._left_led_written = False
-        self._right_led_written = False
-        self._note_written = False
-        self._line_tracer_mode_written = False
-        self._line_tracer_speed_written = False
-        self._io_mode_a_written = False
-        self._io_mode_b_written = False
-        self._config_proximity_written = False
-        self._config_gravity_written = False
-        self._config_band_width_written = False
-
-        self._light = 0
-        self._temperature = 0
-        
-        self._line_tracer_flag = 0
-        self._line_tracer_event = 0
-        self._line_tracer_state = 0
-        self._line_tracer_count = 0
-        
-        self._event_tilt = -4
-        self._event_battery_state = -1
+        self._output_1 = 0
+        self._output_2 = 0
+        self._output_3 = 0
+        self._left_motor = 0
+        self._right_motor = 0
+        self._note = 0
         
         self._create_model()
 
@@ -185,45 +162,7 @@ class NeosocoNeobot(Neobot):
         self._output_3 = 0
         self._left_motor = 0
         self._right_motor = 0
-
-        self._left_wheel = 0
-        self._right_wheel = 0
-        self._buzzer = 0
-        self._output_a = 0
-        self._output_b = 0
-        self._topology = 0
-        self._left_led = 0
-        self._right_led = 0
         self._note = 0
-        self._line_tracer_mode = 0
-        self._line_tracer_speed = 5
-        self._io_mode_a = 0
-        self._io_mode_b = 0
-        self._config_proximity = 2
-        self._config_gravity = 0
-        self._config_band_width = 3
-
-        self._topology_written = False
-        self._left_led_written = False
-        self._right_led_written = False
-        self._note_written = False
-        self._line_tracer_mode_written = False
-        self._line_tracer_speed_written = False
-        self._io_mode_a_written = False
-        self._io_mode_b_written = False
-        self._config_proximity_written = False
-        self._config_gravity_written = False
-        self._config_band_width_written = False
-
-        self._light = 0
-        self._temperature = 0
-        
-        self._line_tracer_event = 0
-        self._line_tracer_state = 0
-        self._line_tracer_count = 0
-        
-        self._event_tilt = -4
-        self._event_battery_state = -1
 
     def _request_motoring_data(self):
         with self._thread_lock:
@@ -304,7 +243,7 @@ class NeosocoLinkNeobot(NeosocoNeobot):
 
     def _init(self, port_name=None):
         self._tag = "Neosoco[{}]".format(self._index)
-        Linker.register_roboid('hamster', 'hamster', self._index, self._tag, self)
+        Linker.register_neobot('hamster', 'hamster', self._index, self._tag, self)
         while self._ready == False and self._is_disposed() == False:
             time.sleep(0.01)
         if self._is_hamster_s:

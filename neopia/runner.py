@@ -1,4 +1,4 @@
-# Part of the ROBOID project - https://roboticsware.uz
+# Part of the RoboticsWare project - https://roboticsware.uz
 # Copyright (C) 2022 RoboticsWare (neopia.uz@gmail.com)
 # 
 # This library is free software; you can redistribute it and/or

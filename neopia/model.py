@@ -1,4 +1,4 @@
-# Part of the ROBOID project - https://roboticsware.uz
+# Part of the RoboticsWare project - https://roboticsware.uz
 # Copyright (C) 2022 RoboticsWare (neopia.uz@gmail.com)
 # 
 # This library is free software; you can redistribute it and/or
@@ -268,14 +268,14 @@ class Neobot(NamedElement):
             self._motoring_devices.append(dev)
         return dev
 
-    def _add_roboid(self, neobot):
+    def _add_neobot(self, neobot):
         if isinstance(neobot, Neobot):
             self._neobots.append(neobot)
 
     def get_id(self):
         return self._id
 
-    def find_roboid_by_name(self, name):
+    def find_neobot_by_name(self, name):
         name = str(name).lower()
         dot = name.find(".")
         if dot < 0:
@@ -283,11 +283,11 @@ class Neobot(NamedElement):
                 if name == neobot.get_name().lower():
                     return neobot
         else:
-            roboid_name = name[:dot]
+            neobot_name = name[:dot]
             sub_name = name[dot+1:]
             for neobot in self._neobots:
-                if roboid_name == neobot.get_name().lower():
-                    return neobot.find_roboid_by_name(sub_name)
+                if neobot_name == neobot.get_name().lower():
+                    return neobot.find_neobot_by_name(sub_name)
         return None
 
     def find_device_by_name(self, name):
@@ -298,10 +298,10 @@ class Neobot(NamedElement):
                 if name == device.get_name().lower():
                     return device
         else:
-            roboid_name = name[:dot]
+            neobot_name = name[:dot]
             sub_name = name[dot+1:]
             for neobot in self._neobots:
-                if roboid_name == neobot.get_name().lower():
+                if neobot_name == neobot.get_name().lower():
                     return neobot.find_device_by_name(sub_name)
         return None
 
@@ -430,11 +430,11 @@ class Robot(NamedElement):
         for neobot in self._neobots:
             neobot._reset()
 
-    def _add_roboid(self, neobot):
+    def _add_neobot(self, neobot):
         if isinstance(neobot, Neobot):
             self._neobots.append(neobot)
 
-    def find_roboid_by_name(self, name):
+    def find_neobot_by_name(self, name):
         name = str(name).lower()
         dot = name.find(".")
         if dot < 0:
@@ -442,21 +442,21 @@ class Robot(NamedElement):
                 if name == neobot.get_name().lower():
                     return neobot
         else:
-            roboid_name = name[:dot]
+            neobot_name = name[:dot]
             sub_name = name[dot+1:]
             for neobot in self._neobots:
-                if roboid_name == neobot.get_name().lower():
-                    return neobot.find_roboid_by_name(sub_name)
+                if neobot_name == neobot.get_name().lower():
+                    return neobot.find_neobot_by_name(sub_name)
         return None
 
     def find_device_by_name(self, name):
         name = str(name).lower()
         dot = name.find(".")
         if dot >= 0:
-            roboid_name = name[:dot]
+            neobot_name = name[:dot]
             sub_name = name[dot+1:]
             for neobot in self._neobots:
-                if roboid_name == neobot.get_name().lower():
+                if neobot_name == neobot.get_name().lower():
                     return neobot.find_device_by_name(sub_name)
         return None
 

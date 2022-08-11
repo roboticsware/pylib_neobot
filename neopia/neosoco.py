@@ -1,4 +1,4 @@
-# Part of the ROBOID project - https://roboticsware.uz
+# Part of the RoboticsWare project - https://roboticsware.uz
 # Copyright (C) 2022 RoboticsWare (neopia.uz@gmail.com)
 # 
 # This library is free software; you can redistribute it and/or
@@ -59,33 +59,18 @@ class Neosoco(Robot):
     COLOR_NAME_PURPLE = "purple"
     COLOR_NAME_WHITE = "white"
 
-    LINE_TRACER_MODE_OFF = 0
-    LINE_TRACER_MODE_BLACK_LEFT_SENSOR = 1
-    LINE_TRACER_MODE_BLACK_RIGHT_SENSOR = 2
-    LINE_TRACER_MODE_BLACK_BOTH_SENSORS = 3
-    LINE_TRACER_MODE_BLACK_TURN_LEFT = 4
-    LINE_TRACER_MODE_BLACK_TURN_RIGHT = 5
-    LINE_TRACER_MODE_BLACK_MOVE_FORWARD = 6
-    LINE_TRACER_MODE_BLACK_UTURN = 7
-    LINE_TRACER_MODE_WHITE_LEFT_SENSOR = 8
-    LINE_TRACER_MODE_WHITE_RIGHT_SENSOR = 9
-    LINE_TRACER_MODE_WHITE_BOTH_SENSORS = 10
-    LINE_TRACER_MODE_WHITE_TURN_LEFT = 11
-    LINE_TRACER_MODE_WHITE_TURN_RIGHT = 12
-    LINE_TRACER_MODE_WHITE_MOVE_FORWARD = 13
-    LINE_TRACER_MODE_WHITE_UTURN = 14
-
-    IO_MODE_ANALOG_INPUT = 0
-    IO_MODE_DIGITAL_INPUT = 1
-    IO_MODE_SERVO_OUTPUT = 8
-    IO_MODE_PWM_OUTPUT = 9
-    IO_MODE_DIGITAL_OUTPUT = 10
-
-    IO_MODE_NAME_ANALOG_INPUT = "analog input"
-    IO_MODE_NAME_DIGITAL_INPUT = "digital input"
-    IO_MODE_NAME_SERVO_OUTPUT = "servo output"
-    IO_MODE_NAME_PWM_OUTPUT = "pwm output"
-    IO_MODE_NAME_DIGITAL_OUTPUT = "digital output"
+    _COLORS = {
+        "off": LED_OFF,
+        "red": LED_RED,
+        "yellow": LED_YELLOW,
+        "green": LED_GREEN,
+        "sky_blue": LED_CYAN,
+        "skyblue": LED_CYAN,
+        "sky blue": LED_CYAN,
+        "blue": LED_BLUE,
+        "purple": LED_MAGENTA,
+        "white": LED_WHITE
+    }
 
     _NOTE_OFF = 0
     _NOTE_C_1 = 1
@@ -208,30 +193,7 @@ class Neosoco(Robot):
     NOTE_NAME_A_SHARP = "A#"
     NOTE_NAME_B_FLAT = "Bb"
     NOTE_NAME_B = "B"
-
-    TILT_FORWARD = 1
-    TILT_BACKWARD = -1
-    TILT_LEFT = 2
-    TILT_RIGHT = -2
-    TILT_FLIP = 3
-    TILT_NOT = -3
-
-    BATTERY_NORMAL = 2
-    BATTERY_LOW = 1
-    BATTERY_EMPTY = 0
-
-    _COLORS = {
-        "off": LED_OFF,
-        "red": LED_RED,
-        "yellow": LED_YELLOW,
-        "green": LED_GREEN,
-        "sky_blue": LED_CYAN,
-        "skyblue": LED_CYAN,
-        "sky blue": LED_CYAN,
-        "blue": LED_BLUE,
-        "purple": LED_MAGENTA,
-        "white": LED_WHITE
-    }
+    
     _NOTES = {
         0: _NOTE_OFF,
         "c": _NOTE_C_1,
@@ -252,18 +214,7 @@ class Neosoco(Robot):
         "bb": _NOTE_B_FLAT_1,
         "b": _NOTE_B_1
     }
-    _IO_MODES = {
-        "analog_input": IO_MODE_ANALOG_INPUT,
-        "analog input": IO_MODE_ANALOG_INPUT,
-        "digital_input": IO_MODE_DIGITAL_INPUT,
-        "digital input": IO_MODE_DIGITAL_INPUT,
-        "servo_output": IO_MODE_SERVO_OUTPUT,
-        "servo output": IO_MODE_SERVO_OUTPUT,
-        "pwm_output": IO_MODE_PWM_OUTPUT,
-        "pwm output": IO_MODE_PWM_OUTPUT,
-        "digital_output": IO_MODE_DIGITAL_OUTPUT,
-        "digital output": IO_MODE_DIGITAL_OUTPUT
-    }
+
     _MOTOR_PERCENT_CVT = { 
         '100': 15,
         '90': 14,
@@ -277,10 +228,12 @@ class Neosoco(Robot):
         '10': 2,
         '0': 0
     }
+
     _MOTOR_DIR = { 
         'forward': 16,
         'backward': 32
     }
+    
     _robots = {}
 
     def __init__(self, index=0, port_name=None):
@@ -297,42 +250,42 @@ class Neosoco(Robot):
 
     def dispose(self):
         Neosoco._robots[self.get_index()] = None
-        self._roboid._dispose()
+        self._neobot._dispose()
         Runner.unregister_robot(self)
 
     def reset(self):
         self._bpm = 60
-        self._roboid._reset()
+        self._neobot._reset()
 
     def _init(self, port_name):
         if Mode.is_link_mode():
             from neopia.neosoco_neobot import NeosocoLinkNeobot
-            self._roboid = NeosocoLinkNeobot(self.get_index())
+            self._neobot = NeosocoLinkNeobot(self.get_index())
         else:
             from neopia.neosoco_neobot import NeosocoNeobot
-            self._roboid = NeosocoNeobot(self.get_index())
-        self._add_roboid(self._roboid)
+            self._neobot = NeosocoNeobot(self.get_index())
+        self._add_neobot(self._neobot)
         Runner.register_robot(self)
         Runner.start()
-        self._roboid._init(port_name)
+        self._neobot._init(port_name)
 
     def find_device_by_id(self, device_id):
-        return self._roboid.find_device_by_id(device_id)
+        return self._neobot.find_device_by_id(device_id)
 
     def _request_motoring_data(self):
-        self._roboid._request_motoring_data()
+        self._neobot._request_motoring_data()
 
     def _update_sensory_device_state(self):
-        self._roboid._update_sensory_device_state()
+        self._neobot._update_sensory_device_state()
 
     def _update_motoring_device_state(self):
-        self._roboid._update_motoring_device_state()
+        self._neobot._update_motoring_device_state()
 
     def _notify_sensory_device_data_changed(self):
-        self._roboid._notify_sensory_device_data_changed()
+        self._neobot._notify_sensory_device_data_changed()
 
     def _notify_motoring_device_data_changed(self):
-        self._roboid._notify_motoring_device_data_changed()
+        self._neobot._notify_motoring_device_data_changed()
 
     def set_value(self, port='out1', value=255):
         if isinstance(port, str) and isinstance(value, int):
@@ -566,407 +519,3 @@ class Neosoco(Robot):
             self.write(Neosoco.NOTE, value)
         else:
             raise TypeError
-
-    def wheels(self, left_velocity, right_velocity=None):
-        self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
-        if isinstance(left_velocity, (int, float)):
-            self.write(Neosoco.LEFT_WHEEL, Util.round(left_velocity))
-        if isinstance(right_velocity, (int, float)):
-            self.write(Neosoco.RIGHT_WHEEL, Util.round(right_velocity))
-        else:
-            if isinstance(left_velocity, (int, float)):
-                self.write(Neosoco.RIGHT_WHEEL, Util.round(left_velocity))
-
-    def left_wheel(self, velocity):
-        self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
-        if isinstance(velocity, (int, float)):
-            self.write(Neosoco.LEFT_WHEEL, Util.round(velocity))
-
-    def right_wheel(self, velocity):
-        self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
-        if isinstance(velocity, (int, float)):
-            self.write(Neosoco.RIGHT_WHEEL, Util.round(velocity))
-
-    def stop(self):
-        self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
-        self.write(Neosoco.LEFT_WHEEL, 0)
-        self.write(Neosoco.RIGHT_WHEEL, 0)
-
-    def _motion_sec(self, sec, left_velocity, right_velocity):
-        self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
-        if sec < 0:
-            sec = -sec
-            left_velocity = -left_velocity
-            right_velocity = -right_velocity
-        if sec > 0:
-            self.write(Neosoco.LEFT_WHEEL, Util.round(left_velocity))
-            self.write(Neosoco.RIGHT_WHEEL, Util.round(right_velocity))
-            Runner.wait(sec * 1000)
-        self.write(Neosoco.LEFT_WHEEL, 0)
-        self.write(Neosoco.RIGHT_WHEEL, 0)
-
-    def move_forward(self, sec=1, velocity=30):
-        if isinstance(sec, (int, float)) and isinstance(velocity, (int, float)):
-            self._motion_sec(sec, velocity, velocity)
-
-    def move_backward(self, sec=1, velocity=30):
-        if isinstance(sec, (int, float)) and isinstance(velocity, (int, float)):
-            self._motion_sec(sec, -velocity, -velocity)
-
-    def turn_left(self, sec=1, velocity=30):
-        if isinstance(sec, (int, float)) and isinstance(velocity, (int, float)):
-            self._motion_sec(sec, -velocity, velocity)
-
-    def turn_right(self, sec=1, velocity=30):
-        if isinstance(sec, (int, float)) and isinstance(velocity, (int, float)):
-            self._motion_sec(sec, velocity, -velocity)
-
-    def _evaluate_line_tracer(self):
-        return self.e(Neosoco.LINE_TRACER_STATE) and self.read(Neosoco.LINE_TRACER_STATE) == 0x40
-
-    def line_tracer_mode(self, mode):
-        self.write(Neosoco.LEFT_WHEEL, 0)
-        self.write(Neosoco.RIGHT_WHEEL, 0)
-        if isinstance(mode, (int, float)):
-            mode = int(mode)
-            self.write(Neosoco.LINE_TRACER_MODE, mode)
-            if (mode >= 4 and mode <= 7) or (mode >= 11 and mode <= 14):
-                Runner.wait_until(self._evaluate_line_tracer)
-                self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
-
-    def line_left(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_BLACK_LEFT_SENSOR)
-
-    def line_right(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_BLACK_RIGHT_SENSOR)
-
-    def line_both(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_BLACK_BOTH_SENSORS)
-
-    def cross_forward(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_BLACK_MOVE_FORWARD)
-
-    def cross_left(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_BLACK_TURN_LEFT)
-
-    def cross_right(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_BLACK_TURN_RIGHT)
-
-    def cross_uturn(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_BLACK_UTURN)
-
-    def white_line_left(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_WHITE_LEFT_SENSOR)
-
-    def white_line_right(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_WHITE_RIGHT_SENSOR)
-
-    def white_line_both(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_WHITE_BOTH_SENSORS)
-
-    def white_cross_forward(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_WHITE_MOVE_FORWARD)
-
-    def white_cross_left(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_WHITE_TURN_LEFT)
-
-    def white_cross_right(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_WHITE_TURN_RIGHT)
-
-    def white_cross_uturn(self):
-        self.line_tracer_mode(Neosoco.LINE_TRACER_MODE_WHITE_UTURN)
-
-    def line_speed(self, speed):
-        if isinstance(speed, (int, float)):
-            self.write(Neosoco.LINE_TRACER_SPEED, Util.round(speed))
-
-    def line_tracer_speed(self, speed):
-        self.line_speed(speed)
-
-    def _evaluate_board_forward(self):
-        if self._board_state == 1:
-            if self._board_count < 2:
-                left_floor = self.read(Neosoco.LEFT_FLOOR)
-                right_floor = self.read(Neosoco.RIGHT_FLOOR)
-                if left_floor < 50 and right_floor < 50:
-                    self._board_count += 1
-                else:
-                    self._board_count = 0
-                diff = left_floor - right_floor
-                self.write(Neosoco.LEFT_WHEEL, Util.round(45 + diff * 0.25))
-                self.write(Neosoco.RIGHT_WHEEL, Util.round(45 - diff * 0.25))
-            else:
-                self._board_count = 0
-                self._board_state = 2
-        elif self._board_state == 2:
-            if self._board_count < 10:
-                self._board_count += 1
-                diff = self.read(Neosoco.LEFT_FLOOR) - self.read(Neosoco.RIGHT_FLOOR)
-                self.write(Neosoco.LEFT_WHEEL, Util.round(45 + diff * 0.25))
-                self.write(Neosoco.RIGHT_WHEEL, Util.round(45 - diff * 0.25))
-            else:
-                self.write(Neosoco.LEFT_WHEEL, 0)
-                self.write(Neosoco.RIGHT_WHEEL, 0)
-                return True
-        return False
-
-    def board_forward(self):
-        self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
-        self.write(Neosoco.LEFT_WHEEL, 45)
-        self.write(Neosoco.RIGHT_WHEEL, 45)
-        self._board_count = 0
-        self._board_state = 1
-        Runner.wait_until(self._evaluate_board_forward)
-
-    def _evaluate_board_left(self):
-        state = self._board_state
-        if state == 1:
-            if self._board_count < 2:
-                if self.read(Neosoco.LEFT_FLOOR) > 50:
-                    self._board_count += 1
-            else:
-                self._board_count = 0
-                self._board_state = 2
-        elif state == 2:
-            if self.read(Neosoco.LEFT_FLOOR) < 20:
-                self._board_state = 3
-        elif state == 3:
-            if self._board_count < 2:
-                if self.read(Neosoco.LEFT_FLOOR) < 20:
-                    self._board_count += 1
-            else:
-                self._board_count = 0
-                self._board_state = 4
-        elif state == 4:
-            if self.read(Neosoco.LEFT_FLOOR) > 50:
-                self._board_state = 5
-        elif state == 5:
-            diff = self.read(Neosoco.LEFT_FLOOR) - self.read(Neosoco.RIGHT_FLOOR)
-            if diff > -15:
-                self.write(Neosoco.LEFT_WHEEL, 0)
-                self.write(Neosoco.RIGHT_WHEEL, 0)
-                return True
-            else:
-                self.write(Neosoco.LEFT_WHEEL, Util.round(diff * 0.5))
-                self.write(Neosoco.RIGHT_WHEEL, -Util.round(diff * 0.5))
-        return False
-
-    def board_left(self):
-        self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
-        self.write(Neosoco.LEFT_WHEEL, -45)
-        self.write(Neosoco.RIGHT_WHEEL, 45)
-        self._board_count = 0
-        self._board_state = 1
-        Runner.wait_until(self._evaluate_board_left)
-
-    def _evaluate_board_right(self):
-        state = self._board_state
-        if state == 1:
-            if self._board_count < 2:
-                if self.read(Neosoco.RIGHT_FLOOR) > 50:
-                    self._board_count += 1
-            else:
-                self._board_count = 0
-                self._board_state = 2
-        elif state == 2:
-            if self.read(Neosoco.RIGHT_FLOOR) < 20:
-                self._board_state = 3
-        elif state == 3:
-            if self._board_count < 2:
-                if self.read(Neosoco.RIGHT_FLOOR) < 20:
-                    self._board_count += 1
-            else:
-                self._board_count = 0
-                self._board_state = 4
-        elif state == 4:
-            if self.read(Neosoco.RIGHT_FLOOR) > 50:
-                self._board_state = 5
-        elif state == 5:
-            diff = self.read(Neosoco.RIGHT_FLOOR) - self.read(Neosoco.LEFT_FLOOR)
-            if diff > -15:
-                self.write(Neosoco.LEFT_WHEEL, 0)
-                self.write(Neosoco.RIGHT_WHEEL, 0)
-                return True
-            else:
-                self.write(Neosoco.LEFT_WHEEL, -Util.round(diff * 0.5))
-                self.write(Neosoco.RIGHT_WHEEL, Util.round(diff * 0.5))
-        return False
-
-    def board_right(self):
-        self.write(Neosoco.LINE_TRACER_MODE, Neosoco.LINE_TRACER_MODE_OFF)
-        self.write(Neosoco.LEFT_WHEEL, 45)
-        self.write(Neosoco.RIGHT_WHEEL, -45)
-        self._board_count = 0
-        self._board_state = 1
-        Runner.wait_until(self._evaluate_board_right)
-
-    def leds(self, left_color, right_color=None):
-        if isinstance(left_color, (int, float)):
-            self.write(Neosoco.LEFT_LED, int(left_color))
-        elif isinstance(left_color, str):
-            tmp = left_color.lower()
-            if tmp in Neosoco._COLORS:
-                left_color = Neosoco._COLORS[tmp]
-                self.write(Neosoco.LEFT_LED, left_color)
-        if isinstance(right_color, (int, float)):
-            self.write(Neosoco.RIGHT_LED, int(right_color))
-        elif isinstance(right_color, str):
-            tmp = right_color.lower()
-            if tmp in Neosoco._COLORS:
-                right_color = Neosoco._COLORS[tmp]
-                self.write(Neosoco.RIGHT_LED, right_color)
-        else:
-            if isinstance(left_color, (int, float)):
-                self.write(Neosoco.RIGHT_LED, int(left_color))
-
-    def left_led(self, color):
-        if isinstance(color, (int, float)):
-            self.write(Neosoco.LEFT_LED, int(color))
-        elif isinstance(color, str):
-            tmp = color.lower()
-            if tmp in Neosoco._COLORS:
-                self.write(Neosoco.LEFT_LED, Neosoco._COLORS[tmp])
-
-    def right_led(self, color):
-        if isinstance(color, (int, float)):
-            self.write(Neosoco.RIGHT_LED, int(color))
-        elif isinstance(color, str):
-            tmp = color.lower()
-            if tmp in Neosoco._COLORS:
-                self.write(Neosoco.RIGHT_LED, Neosoco._COLORS[tmp])
-
-    def beep(self):
-        self.write(Neosoco.NOTE, Neosoco.NOTE_OFF)
-        self.write(Neosoco.BUZZER, 440)
-        Runner.wait(100)
-        self.write(Neosoco.BUZZER, 0)
-        Runner.wait(100)
-
-    def tempo(self, bpm):
-        if isinstance(bpm, (int, float)):
-            if bpm > 0:
-                self._bpm = bpm
-
-    def note(self, pitch, beats=None):
-        self.write(Neosoco.BUZZER, 0)
-        if isinstance(pitch, str) and len(pitch) > 0:
-            tmp = pitch.lower()
-            if tmp == "off":
-                pitch = 0
-            else:
-                octave = 4
-                try:
-                    octave = int(tmp[-1])
-                    tmp = tmp[:-1]
-                except ValueError:
-                    pass
-                if tmp in Neosoco._NOTES:
-                    pitch = Neosoco._NOTES[tmp] + (octave - 1) * 12
-        if isinstance(pitch, (int, float)):
-            pitch = int(pitch)
-            if isinstance(beats, (int, float)):
-                bpm = self._bpm
-                if beats > 0 and bpm > 0:
-                    if pitch == 0:
-                        self.write(Neosoco.NOTE, Neosoco.NOTE_OFF)
-                        Runner.wait(beats * 60 * 1000.0 / bpm)
-                    elif pitch > 0:
-                        timeout = beats * 60 * 1000.0 / bpm
-                        tail = 0
-                        if timeout > 100:
-                            tail = 100
-                        self.write(Neosoco.NOTE, pitch)
-                        Runner.wait(timeout - tail)
-                        self.write(Neosoco.NOTE, Neosoco.NOTE_OFF)
-                        if tail > 0:
-                            Runner.wait(tail)
-                else:
-                    self.write(Neosoco.NOTE, Neosoco.NOTE_OFF)
-            elif pitch >= 0:
-                self.write(Neosoco.NOTE, pitch)
-
-    def io_mode_a(self, mode):
-        if isinstance(mode, (int, float)):
-            self.write(Neosoco.IO_MODE_A, int(mode))
-        elif isinstance(mode, str):
-            tmp = mode.lower()
-            if tmp in Neosoco._IO_MODES:
-                self.write(Neosoco.IO_MODE_A, Neosoco._IO_MODES[tmp])
-
-    def io_mode_b(self, mode):
-        if isinstance(mode, (int, float)):
-            self.write(Neosoco.IO_MODE_B, int(mode))
-        elif isinstance(mode, str):
-            tmp = mode.lower()
-            if tmp in Neosoco._IO_MODES:
-                self.write(Neosoco.IO_MODE_B, Neosoco._IO_MODES[tmp])
-
-    def output_a(self, value):
-        if isinstance(value, (int, float)):
-            self.write(Neosoco.OUTPUT_A, Util.round(value))
-
-    def output_b(self, value):
-        if isinstance(value, (int, float)):
-            self.write(Neosoco.OUTPUT_B, Util.round(value))
-
-    def open_gripper(self):
-        self.write(Neosoco.IO_MODE_A, Neosoco.IO_MODE_DIGITAL_OUTPUT)
-        self.write(Neosoco.IO_MODE_B, Neosoco.IO_MODE_DIGITAL_OUTPUT)
-        self.write(Neosoco.OUTPUT_A, 1)
-        self.write(Neosoco.OUTPUT_B, 0)
-        Runner.wait(500)
-
-    def close_gripper(self):
-        self.write(Neosoco.IO_MODE_A, Neosoco.IO_MODE_DIGITAL_OUTPUT)
-        self.write(Neosoco.IO_MODE_B, Neosoco.IO_MODE_DIGITAL_OUTPUT)
-        self.write(Neosoco.OUTPUT_A, 0)
-        self.write(Neosoco.OUTPUT_B, 1)
-        Runner.wait(500)
-
-    def release_gripper(self):
-        self.write(Neosoco.IO_MODE_A, Neosoco.IO_MODE_DIGITAL_OUTPUT)
-        self.write(Neosoco.IO_MODE_B, Neosoco.IO_MODE_DIGITAL_OUTPUT)
-        self.write(Neosoco.OUTPUT_A, 0)
-        self.write(Neosoco.OUTPUT_B, 0)
-
-    def signal_strength(self):
-        return self.read(Neosoco.SIGNAL_STRENGTH)
-
-    def left_proximity(self):
-        return self.read(Neosoco.LEFT_PROXIMITY)
-
-    def right_proximity(self):
-        return self.read(Neosoco.RIGHT_PROXIMITY)
-
-    def left_floor(self):
-        return self.read(Neosoco.LEFT_FLOOR)
-
-    def right_floor(self):
-        return self.read(Neosoco.RIGHT_FLOOR)
-
-    def acceleration_x(self):
-        return self.read(Neosoco.ACCELERATION, 0)
-
-    def acceleration_y(self):
-        return self.read(Neosoco.ACCELERATION, 1)
-
-    def acceleration_z(self):
-        return self.read(Neosoco.ACCELERATION, 2)
-
-    def light(self):
-        return self.read(Neosoco.LIGHT)
-
-    def temperature(self):
-        return self.read(Neosoco.TEMPERATURE)
-
-    def input_a(self):
-        return self.read(Neosoco.INPUT_A)
-
-    def input_b(self):
-        return self.read(Neosoco.INPUT_B)
-
-    def tilt(self):
-        return self.read(Neosoco.TILT)
-
-    def battery_state(self):
-        return self.read(Neosoco.BATTERY_STATE)

@@ -1,4 +1,4 @@
-# Part of the ROBOID project - https://roboticsware.uz
+# Part of the RoboticsWare project - https://roboticsware.uz
 # Copyright (C) 2022 RoboticsWare (neopia.uz@gmail.com)
 # 
 # This library is free software; you can redistribute it and/or
@@ -28,10 +28,3 @@ class Util(object):
                 return int(0.5 + value)
         else:
             return 0
-    @staticmethod
-    def print_message(message):
-        sys.stdout.write("{}: {}\n".format('Debug', message))
-
-    @staticmethod
-    def print_error(message):
-        sys.stderr.write("{}: {}\n".format('Error', message))

@@ -1,4 +1,4 @@
-# Part of the ROBOID project - https://roboticsware.uz
+# Part of the RoboticsWare project - https://roboticsware.uz
 # Copyright (C) 2022 RoboticsWare (neopia.uz@gmail.com)
 # 
 # This library is free software; you can redistribute it and/or
@@ -28,13 +28,13 @@ from neopia.connector import State
 
 class Link(object):
     def __init__(self, tag, neobot):
-        self._roboid = None
+        self._neobot = None
         self._tag = tag
-        self._roboid = neobot
+        self._neobot = neobot
         self._connection_state = -1
 
     def get_motoring(self):
-        return self._roboid.get_motoring()
+        return self._neobot.get_motoring()
 
     def handle_sensory(self, received):
         connection_state = received['connectionState']
@@ -48,11 +48,11 @@ class Link(object):
                 Linker.print_error(self._tag, 'Connection lost')
             elif connection_state == State.DISCONNECTED:
                 Linker.print_error(self._tag, 'Disconnected')
-        if self._roboid is not None:
-            self._roboid.decode_sensory(received)
+        if self._neobot is not None:
+            self._neobot.decode_sensory(received)
 
     def handle_motoring(self):
-        self._roboid.encode_motoring()
+        self._neobot.encode_motoring()
 
 
 class Linker(object):
@@ -91,7 +91,7 @@ class Linker(object):
         return link
 
     @staticmethod
-    def register_roboid(group, module, index, tag, neobot):
+    def register_neobot(group, module, index, tag, neobot):
         Linker._get_or_create_link(group, module, index, tag, neobot)
 
     @staticmethod

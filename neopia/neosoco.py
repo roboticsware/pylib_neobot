@@ -425,6 +425,22 @@ class Neosoco(Robot):
         else:
             raise TypeError
         Runner.wait(100) # Since broadcast from controller is per 100ms
+        
+    def motor_stop(self, which_motor: str):
+        if isinstance(which_motor, str):
+            if which_motor.lower() =='right':
+                self.write(Neosoco.RIGHT_MOTOR, 0)
+            elif which_motor.lower() =='left':
+                self.write(Neosoco.LEFT_MOTOR, 0)
+            elif which_motor.lower() =='both':
+                self.write(Neosoco.LEFT_MOTOR, 0)
+                self.write(Neosoco.RIGHT_MOTOR, 0)
+            else:
+                Util.print_error('Wrong value of motor')
+                raise ValueError
+        else:
+            raise TypeError
+        Runner.wait(100) # Since brocast from cotroller is per 100ms
 
     def _convert_input_port_scale(self, port, limit_val):
         if port.lower() =='in1':

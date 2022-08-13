@@ -328,6 +328,19 @@ class Neosoco(Robot):
         else:
             raise TypeError
 
+    def get_angle(self, port='in1'):
+        if isinstance(port, str):
+            if port.lower() =='in1':
+                return self.read(Neosoco.INPUT_1)
+            elif port.lower() =='in2':
+                return self.read(Neosoco.INPUT_2)
+            elif port.lower() =='in3':
+                return self.read(Neosoco.INPUT_3)
+            else:
+                raise ValueError('Wrong value of port')
+        else:
+            raise TypeError
+
     def convert_scale(self, port='in1', omin=0, omax=255, tmin=0, tmax=100):
         if isinstance(port, str):
             if port.lower() =='in1':

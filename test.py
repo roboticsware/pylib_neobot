@@ -2,6 +2,7 @@ from neopia import *
 
 n =  Neosoco()
 
+## LED
 # case1) Turn on LED with 100% brightness during 1s
 # n.led_on('out1', '100')
 # wait(1000)
@@ -10,6 +11,7 @@ n =  Neosoco()
 # n.set_value('out1', 255)
 # wait(1000)
 
+## LED, distance sensor
 # case3) Turn on LED when the distance is under 10cm
 # while True:
 #   if n.get_value('in1') < 10:
@@ -17,6 +19,7 @@ n =  Neosoco()
 #   else:
 #     n.led_off('out1')
 
+## Motors
 # case4-1) Move forth and back during 1s and stop
 # n.motor_move('forward')
 # wait(500)
@@ -40,12 +43,13 @@ n =  Neosoco()
 #     n.motor_move('stop')
 
 # case5) Move forth and back with speed 30% during 1s and stop
-n.motor_rotate('both', 'forward', '30')
-wait(500)
-n.motor_rotate('both', 'backward', '30')
-wait(500)
-n.motor_move('stop')
+# n.motor_rotate('both', 'forward', '30')
+# wait(500)
+# n.motor_rotate('both', 'backward', '30')
+# wait(500)
+# n.motor_move('stop')
 
+## Buzzer
 # case6) Play same note by pitch, sharp and flat, and a length of note
 # n.buzzer('3', n.NOTE_NAME_C)
 # n.buzzer('3', 'c')
@@ -60,6 +64,15 @@ n.motor_move('stop')
 # while True:
 #   n.buzzer_by_port('in1')
   
+## Color LED, distance sensor
 # case8) Color LED on with variable color by input port
 # r = g = b = n.convert_scale('in1', 0, 255, 85, 170) # Limit to middle brightness
 # color_led_on('out1', r, g, b)
+
+## LED, Angle sensor
+# case9) # Turn on LED when a degree of the angle sensor is under 90 degrees
+while True:
+  if n.get_angle('in1') < 90:
+    n.led_on('out1', '100')
+  else:
+    n.led_off('out1')

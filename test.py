@@ -79,11 +79,16 @@ n =  Neosoco()
 
 # Servo Motor
 # case 11) Rotate servo motor forth and back with speed 50% during 5s and stop
-n.servo_motor_rotate('out2', 'forward', '50')
-wait(2000)
-n.servo_motor_rotate('out2', 'forward', '0')
-wait(1000)
-n.servo_motor_rotate('out2', 'backward', '50')
-wait(2000)
-n.servo_motor_rotate('out2', 'forward', '0')
-wait(1000)
+# n.servo_motor_rotate('out2', 'forward', '50')
+# wait(2000)
+# n.servo_motor_rotate('out2', 'forward', '0')
+# wait(1000)
+# n.servo_motor_rotate('out2', 'backward', '50')
+# wait(2000)
+# n.servo_motor_rotate('out2', 'forward', '0')
+# wait(1000)
+
+# case 12) Rotate servo motor forward by 120 degrees at 50% speed within 3 seconds
+n.servo_motor_init('out1')
+n.servo_motor_rotate_by_degree('out1', 'forward', '50', '120')
+wait(3000)

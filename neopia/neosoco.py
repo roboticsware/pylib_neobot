@@ -300,6 +300,17 @@ class Neosoco(Robot):
 
     _SERVO_STOP = 254
     _SERVO_RESET_DEG = 186
+
+    _REMOTE_BTN_CVT = {
+        'up': 1,
+        'down': 2,
+        'left': 3,
+        'right': 4,
+        '1': 10,
+        '2': 11,
+        '3': 12,
+        '4': 13,
+    }
     
     _robots = {}
 
@@ -472,7 +483,7 @@ class Neosoco(Robot):
         else:
             raise TypeError
 
-    def led_off(self, port='port1'):
+    def led_off(self, port='out1'):
         if isinstance(port, str):
             if port.lower() =='out1':
                 self.write(Neosoco.OUTPUT_1, 0) 
@@ -692,19 +703,19 @@ class Neosoco(Robot):
         else:
             pitch = Neosoco._NOTES[note.lower()] + (int(pitch) - 1) * 12
         if isinstance(pitch, (int, float)):
-            cvt_dic = {
+            bpm_cvt = {
                 '2': 1,
                 '4': 0.5,
                 '8': 0.25,
                 '16': 0.125
             }
-            if beats in cvt_dic.keys():
+            if beats in bpm_cvt.keys():
                 bpm = self._bpm # default 60
                 if note == 0:
                     self.write(Neosoco.NOTE, Neosoco._NOTE_OFF)
-                    Runner.wait(cvt_dic[beats] * 60 * 1000.0 / bpm)
+                    Runner.wait(bpm_cvt[beats] * 60 * 1000.0 / bpm)
                 else:
-                    timeout = cvt_dic[beats] * 60 * 1000.0 / bpm
+                    timeout = bpm_cvt[beats] * 60 * 1000.0 / bpm
                     tail = 0
                     if timeout > 100:
                         tail = 100
@@ -721,5 +732,17 @@ class Neosoco(Robot):
             # Map to 0~65 from 0~100(max), it's same as Entry
             value = self._convert_scale_from_input_port(port, 65)
             self.write(Neosoco.NOTE, value)
+        else:
+            raise TypeError
+
+    def remote_button(self, button='1'):
+        if isinstance(button, str):
+            if button in self._REMOTE_BTN_CVT.keys():
+                if self._REMOTE_BTN_CVT[button] == self.read(Neosoco.REMOCTL):
+                    return True
+                else:
+                    return False
+            else:
+                raise ValueError('Wrong value of button')
         else:
             raise TypeError

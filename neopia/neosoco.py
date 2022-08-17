@@ -512,6 +512,22 @@ class Neosoco(Robot):
         else:
             raise TypeError
         Runner.wait(100) # Since broadcast from controller is per 100ms
+        
+    def motor_stop(self, which_motor: str):
+        if isinstance(which_motor, str):
+            if which_motor.lower() =='right':
+                self.write(Neosoco.RIGHT_MOTOR, 0)
+            elif which_motor.lower() =='left':
+                self.write(Neosoco.LEFT_MOTOR, 0)
+            elif which_motor.lower() =='both':
+                self.write(Neosoco.LEFT_MOTOR, 0)
+                self.write(Neosoco.RIGHT_MOTOR, 0)
+            else:
+                Runner.shutdown() # The motor will not stop unless the shutdown() function is used
+                raise ValueError('Wrong value of motor')
+        else:
+            Runner.shutdown() # The motor will not stop unless the shutdown() function is used
+            raise TypeError
 
     def _convert_sacle_within_100(self, value, cvt_max_val):
         # Map to 0~limited_val from 0~100(max), it's same as Entry

@@ -2,6 +2,7 @@ from neopia import *
 
 n =  Neosoco()
 
+## LED
 # case1) Turn on LED with 100% brightness during 1s
 # n.led_on('out1', '100')
 # wait(1000)
@@ -10,6 +11,7 @@ n =  Neosoco()
 # n.set_value('out1', 255)
 # wait(1000)
 
+## LED, distance sensor
 # case3) Turn on LED when the distance is under 10cm
 # while True:
 #   if n.get_value('in1') < 10:
@@ -17,14 +19,15 @@ n =  Neosoco()
 #   else:
 #     n.led_off('out1')
 
-# case4-1) Move forth and back during 1s and stop
+## Motors
+# case4) Move forth and back during 1s and stop
 # n.motor_move('forward')
 # wait(500)
 # n.motor_move('backward')
 # wait(500)
 # n.motor_move('stop')
 
-# case4-2) Moving control by direction keys on the keyboard
+# case5) Moving control by direction keys on the keyboard
 # while True:
 #   key = Keyboard.read()
 
@@ -39,14 +42,15 @@ n =  Neosoco()
 #   elif key == ' ':
 #     n.motor_move('stop')
 
-# case5) Move forth and back with speed 30% during 1s and stop
-n.motor_rotate('both', 'forward', '30')
-wait(500)
-n.motor_rotate('both', 'backward', '30')
-wait(500)
-n.motor_move('stop')
+# case6) Move forth and back with speed 30% during 1s and stop
+# n.motor_rotate('both', 'forward', '30')
+# wait(500)
+# n.motor_rotate('both', 'backward', '30')
+# wait(500)
+# n.motor_move('stop')
 
-# case6) Play same note by pitch, sharp and flat, and a length of note
+## Buzzer
+# case7) Play same note by pitch, sharp and flat, and a length of note
 # n.buzzer('3', n.NOTE_NAME_C)
 # n.buzzer('3', 'c')
 
@@ -56,10 +60,35 @@ n.motor_move('stop')
 # n.buzzer('5', n.NOTE_NAME_D_FLAT, '16')
 # n.buzzer('5', 'db', '16')
 
-# case7) Play a sound by value from input port
+# case8) Play a sound by value from input port
 # while True:
 #   n.buzzer_by_port('in1')
   
-# case8) Color LED on with variable color by input port
+## Color LED, distance sensor
+# case9) Color LED on with variable color by input port
 # r = g = b = n.convert_scale('in1', 0, 255, 85, 170) # Limit to middle brightness
 # color_led_on('out1', r, g, b)
+
+## LED, Angle sensor
+# case10) # Turn on LED when a degree of the angle sensor is under 90 degrees
+# while True:
+#   if n.get_angle('in1') < 90:
+#     n.led_on('out1', '100')
+#   else:
+#     n.led_off('out1')
+
+# Servo Motor
+# case 11) Rotate servo motor forth and back with speed 50% during 5s and stop
+# n.servo_rotate('out2', 'forward', '50')
+# wait(2000)
+# n.servo_rotate('out2', 'forward', '0')
+# wait(1000)
+# n.servo_rotate('out2', 'backward', '50')
+# wait(2000)
+# n.servo_rotate('out2', 'forward', '0')
+# wait(1000)
+
+# case 12) Rotate servo motor forward by 120 degrees at 50% speed within 3 seconds
+n.servo_reset_degree('out1')
+n.servo_rotate_by_degree('out1', 'forward', '50', '120')
+wait(3000)

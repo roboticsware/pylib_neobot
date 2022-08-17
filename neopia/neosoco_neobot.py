@@ -20,7 +20,6 @@ import time
 import threading
 
 from neopia.runner import Runner
-from neopia.util import Util
 from neopia.model import DeviceType
 from neopia.model import DataType
 from neopia.model import Neobot
@@ -206,6 +205,7 @@ class NeosocoNeobot(Neobot):
         return result
 
     def _decode_sensory_packet(self, packet):
+        # packet[0]~[1] is StartBytes
         self._input_1_device._put(packet[2])
         self._input_2_device._put(packet[3])
         self._input_3_device._put(packet[4])

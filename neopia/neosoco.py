@@ -229,10 +229,77 @@ class Neosoco(Robot):
         '0': 0
     }
 
+    _SERVO_PERCENT_CVT = { 
+        '100': 100,
+        '90': 90,
+        '80': 80,
+        '70': 70,
+        '60': 60,
+        '50': 50,
+        '40': 40,
+        '30': 30,
+        '20': 20,
+        '10': 10,
+        '0': 0
+    }
+
+    _SERVO_DEGREE_CVT = {
+        '180': 180,
+        '175': 175,
+        '170': 170,
+        '165': 165,
+        '160': 160,
+        '155': 155,
+        '150': 150,
+        '145': 145,
+        '140': 140,
+        '135': 135,
+        '130': 130,
+        '125': 125,
+        '120': 120,
+        '115': 115,
+        '110': 110,
+        '105': 105,
+        '100': 100,
+        '95': 95,
+        '90': 90,
+        '85': 85,
+        '80': 80,
+        '75': 75,
+        '70': 70,
+        '65': 65,
+        '60': 60,
+        '55': 55,
+        '50': 50,
+        '45': 45,
+        '40': 40,
+        '35': 35,
+        '30': 30,
+        '25': 25,
+        '20': 20,
+        '15': 15,
+        '10': 10,
+        '5': 5,
+        '0': 0
+    }
+
     _MOTOR_DIR = { 
         'forward': 16,
         'backward': 32
     }
+
+    _SERVO_DIR = { 
+        'forward': 192,
+        'backward': 208
+    }
+
+    _SERVO_DIR_FOR_DEG = { 
+        'forward': 188,
+        'backward': 189
+    }
+
+    _SERVO_STOP = 254
+    _SERVO_RESET_DEG = 186
     
     _robots = {}
 
@@ -252,6 +319,13 @@ class Neosoco(Robot):
         Neosoco._robots[self.get_index()] = None
         self._neobot._dispose()
         Runner.unregister_robot(self)
+        # Lastly send init packe to stop all action in the controller
+        self.write(Neosoco.OUTPUT_1, 0) 
+        self.write(Neosoco.OUTPUT_2, 0) 
+        self.write(Neosoco.OUTPUT_3, 0)
+        self.write(Neosoco.LEFT_MOTOR, 0) 
+        self.write(Neosoco.RIGHT_MOTOR, 0) 
+        self.write(Neosoco.NOTE, 0)
 
     def reset(self):
         self._bpm = 60
@@ -316,6 +390,19 @@ class Neosoco(Robot):
                 return self.read(Neosoco.REMOCTL)
             elif port.lower() =='bat':
                 return self.read(Neosoco.BATTERY)
+            else:
+                raise ValueError('Wrong value of port')
+        else:
+            raise TypeError
+
+    def get_angle(self, port='in1'):
+        if isinstance(port, str):
+            if port.lower() =='in1':
+                return self.read(Neosoco.INPUT_1)
+            elif port.lower() =='in2':
+                return self.read(Neosoco.INPUT_2)
+            elif port.lower() =='in3':
+                return self.read(Neosoco.INPUT_3)
             else:
                 raise ValueError('Wrong value of port')
         else:
@@ -442,7 +529,14 @@ class Neosoco(Robot):
             raise TypeError
         Runner.wait(100) # Since brocast from cotroller is per 100ms
 
-    def _convert_input_port_scale(self, port, limit_val):
+    def _convert_sacle_within_100(self, value, cvt_max_val):
+        # Map to 0~limited_val from 0~100(max), it's same as Entry
+        value = max(value, 0)
+        value = min(value, 100)
+        value = math.ceil(value / 100 * cvt_max_val)
+        return value
+
+    def _convert_scale_from_input_port(self, port, cvt_max_val):
         if port.lower() =='in1':
             value = self.read(Neosoco.INPUT_1)
         elif port.lower() =='in2':
@@ -453,16 +547,13 @@ class Neosoco(Robot):
             raise ValueError('Wrong value of port')
 
         if value:
-            value = max(value, 0)
-            value = min(value, 100)
-            value = math.ceil(value / 100 * limit_val)
-            return value
+            value = self._convert_sacle_within_100(value, cvt_max_val)
+        return value
 
     def motor_rotate(self, motor='both', direction='forward', speed='100'):
         if isinstance(motor, str) and isinstance(direction, str) and isinstance(speed, str):
             if speed == 'in1' or speed == 'in2' or speed == 'in3' :
-                # Map to 0~15 from 0~100(max), it's same as Entry
-                speed = self._convert_input_port_scale(speed, 15)
+                speed = self._convert_scale_from_input_port(speed, 15)
             elif speed in self._MOTOR_PERCENT_CVT.keys():
                 speed = self._MOTOR_PERCENT_CVT[speed]
             else:
@@ -492,6 +583,103 @@ class Neosoco(Robot):
                 self.write(Neosoco.RIGHT_MOTOR, r_direction + speed)
             else:
                 raise ValueError('Wrong value of motor')
+        else:
+            raise TypeError
+
+    def _write_to_output_port(self, port, out_val):
+        if port.lower() == 'out1':
+            self.write(Neosoco.OUTPUT_1, out_val)
+        elif port.lower() == 'out2':
+            self.write(Neosoco.OUTPUT_2, out_val)
+        elif port.lower() == 'out3':
+            self.write(Neosoco.OUTPUT_3, out_val)
+        elif port.lower() == 'all':
+            self.write(Neosoco.OUTPUT_1, out_val)
+            self.write(Neosoco.OUTPUT_2, out_val)
+            self.write(Neosoco.OUTPUT_3, out_val)
+        else:
+            raise ValueError('Wrong value of out port')
+
+    def servo_rotate(self, port='out1', direction='forward', speed='100'):
+        if isinstance(port, str) and isinstance(direction, str) and isinstance(speed, str):
+            if speed == 'in1' or speed == 'in2' or speed == 'in3' :
+                speed = self._convert_scale_from_input_port(speed, 10)
+            elif speed in self._SERVO_PERCENT_CVT.keys():
+                speed = self._SERVO_PERCENT_CVT[speed]
+                speed = self._convert_sacle_within_100(speed, 10)
+            else:
+                raise ValueError('Wrong value of speed')
+
+            if direction.lower() =='forward':
+                direction = self._SERVO_DIR['forward']
+            elif direction.lower() =='backward':
+                direction = self._SERVO_DIR['backward']
+            else:
+                raise ValueError('Wrong value of direction')
+
+            out_val = direction + speed
+            if out_val == direction: # Speed is 0
+                out_val = self._SERVO_STOP
+            else:
+                out_val = out_val - 1
+            
+            self._write_to_output_port(port, out_val)
+        else:
+            raise TypeError
+
+    def servo_reset_degree(self, port='out1'):
+        if isinstance(port, str):
+            self._write_to_output_port(port, self._SERVO_RESET_DEG)
+            Runner.wait(100)
+            self._write_to_output_port(port, 1) # Set where the motor is to 1 degree
+            Runner.wait(100)
+        else:
+            raise TypeError
+
+    def servo_rotate_by_degree(self, port='out1', direction='forward', speed='100', degree='90'):
+        if isinstance(port, str) and isinstance(direction, str) and \
+            isinstance(speed, str) and isinstance(degree, str):
+            if direction.lower() =='forward':
+                direction = self._SERVO_DIR_FOR_DEG['forward']
+            elif direction.lower() =='backward':
+                direction = self._SERVO_DIR_FOR_DEG['backward']
+            else:
+                raise ValueError('Wrong value of direction')
+
+            if speed.lower() =='in1':
+                speed = self.read(Neosoco.INPUT_1)
+            elif speed.lower() =='in2':
+                speed = self.read(Neosoco.INPUT_2)
+            elif port.lower() =='in3':
+                speed = self.read(Neosoco.INPUT_3)
+            elif speed in self._SERVO_PERCENT_CVT.keys():
+                speed = self._SERVO_PERCENT_CVT[speed]
+            else:
+                raise ValueError('Wrong value of speed')
+            speed = max(speed, 0)
+            speed = min(speed, 100)
+            speed = math.ceil(speed / 10) + 240 # range of speed is 240 ~ 250
+            
+            if degree.lower() =='in1':
+                degree = self.read(Neosoco.INPUT_1)
+            elif port.lower() =='in2':
+                degree = self.read(Neosoco.INPUT_2)
+            elif port.lower() =='in3':
+                degree = self.read(Neosoco.INPUT_3)
+            elif degree in self._SERVO_DEGREE_CVT.keys():
+                degree = self._SERVO_DEGREE_CVT[degree]
+            else:
+                raise ValueError('Wrong value of degree')
+            degree = max(degree, 0)
+            degree = min(degree, 180) # max of degree is 180
+            degree = degree + 1
+
+            self._write_to_output_port(port, direction)
+            Runner.wait(100)
+            self._write_to_output_port(port, speed)
+            Runner.wait(100)
+            self._write_to_output_port(port, degree)
+            Runner.wait(100)
         else:
             raise TypeError
 
@@ -531,7 +719,7 @@ class Neosoco(Robot):
     def buzzer_by_port(self, port='in1'):
         if isinstance(port, str):
             # Map to 0~65 from 0~100(max), it's same as Entry
-            value = self._convert_input_port_scale(port, 65)
+            value = self._convert_scale_from_input_port(port, 65)
             self.write(Neosoco.NOTE, value)
         else:
             raise TypeError

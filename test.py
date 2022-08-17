@@ -47,7 +47,7 @@ n =  Neosoco()
 # wait(500)
 # n.motor_rotate('both', 'backward', '30')
 # wait(500)
-# n.motor_move('stop')
+# n.motor_stop('both')
 
 ## Buzzer
 # case7) Play same note by pitch, sharp and flat, and a length of note

@@ -734,15 +734,3 @@ class Neosoco(Robot):
             self.write(Neosoco.NOTE, value)
         else:
             raise TypeError
-
-    def remote_button(self, button='1'):
-        if isinstance(button, str):
-            if button in self._REMOTE_BTN_CVT.keys():
-                if self._REMOTE_BTN_CVT[button] == self.read(Neosoco.REMOCTL):
-                    return True
-                else:
-                    return False
-            else:
-                raise ValueError('Wrong value of button')
-        else:
-            raise TypeError

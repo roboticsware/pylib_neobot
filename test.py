@@ -89,6 +89,15 @@ n =  Neosoco()
 # wait(1000)
 
 # case 12) Rotate servo motor forward by 120 degrees at 50% speed within 3 seconds
-n.servo_reset_degree('out1')
-n.servo_rotate_by_degree('out1', 'forward', '50', '120')
-wait(3000)
+# n.servo_reset_degree('out1')
+# n.servo_rotate_by_degree('out1', 'forward', '50', '120')
+# wait(3000)
+
+# case 13) Turn on LED when sensor detects green color
+while True:
+    print(n.get_value('in1'))
+    wait(500)
+    if n.check_color('in1', 'Green'):
+        n.led_on('out1', '100')
+    else:
+        n.led_off('out1')

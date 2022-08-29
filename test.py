@@ -99,3 +99,7 @@ while True:
     n.led_on() # By default value
   else:
     n.led_off()
+
+# case 14) Control LED's brightness with sensor
+# while True:
+#     n.led_by_port('out1', 'in1')

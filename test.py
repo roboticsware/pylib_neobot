@@ -93,7 +93,14 @@ n =  Neosoco()
 # n.servo_rotate_by_degree('out1', 'forward', '50', '120')
 # wait(3000)
 
-# case 13) Turn on LED when sensor detects green color
+# case 13) When the 1 button of remote controller is pressed, turn on the LED
+while True:
+  if n.remote_button('1'):
+    n.led_on() # By default value
+  else:
+    n.led_off()
+
+# case 14) Turn on LED when sensor detects green color
 while True:
     print(n.get_value('in1'))
     wait(500)

@@ -58,6 +58,12 @@ class Neosoco(Robot):
     COLOR_NAME_BLUE = "blue"
     COLOR_NAME_PURPLE = "purple"
     COLOR_NAME_WHITE = "white"
+    
+    COLOR_SENSOR_WHITE = 'White'
+    COLOR_SENSOR_RED = 'Red'
+    COLOR_SENSOR_YELLOW = 'Yellow'
+    COLOR_SENSOR_GREEN = 'Green'
+    COLOR_SENSOR_BLUE = 'Blue'
 
     _COLORS = {
         "off": LED_OFF,
@@ -439,9 +445,8 @@ class Neosoco(Robot):
         else:
             raise TypeError
 
-    def check_color(self, port='in1', color='White'):
-        c_value = 0
-        if isinstance(port, str):
+    def check_color(self, port='in1', color='white'):
+        if isinstance(port and color, str):
             if port.lower() =='in1':
                 c_value = self.read(Neosoco.INPUT_1)
             elif port.lower() =='in2':
@@ -450,9 +455,6 @@ class Neosoco(Robot):
                 c_value = self.read(Neosoco.INPUT_3)
             else:
                 raise ValueError('Wrong value of port')
-        else:
-            raise ValueError('Wrong value of port')
-        if isinstance(port, str):
             if (c_value >= 10 and c_value <= 50):
                 if (color == 'White'): 
                     return True
@@ -481,7 +483,7 @@ class Neosoco(Robot):
             else:
                 return False 
         else:
-            raise ValueError('Wrong value of color')
+            raise ValueError('Wrong value of port or color')
 
     def led_on(self, port='out1', brightness='100'):
         percent_cvt = {

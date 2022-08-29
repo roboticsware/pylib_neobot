@@ -701,6 +701,12 @@ class Neosoco(Robot):
         else:
             raise TypeError
 
+    def servo_stop(self, port = 'out1'):
+        if isinstance(port, str):
+            self._write_to_output_port(port, 0)
+        else:
+            raise TypeError
+
     def buzzer(self, pitch='3', note='c', beats='4'):
         self.write(Neosoco.NOTE, 0) # init
         if not isinstance(pitch, str) or not (int(pitch) >= 1 and int(pitch) <= 6):
@@ -739,5 +745,20 @@ class Neosoco(Robot):
             # Map to 0~65 from 0~100(max), it's same as Entry
             value = self._convert_scale_from_input_port(port, 65)
             self.write(Neosoco.NOTE, value)
+        else:
+            raise TypeError
+    
+    def buzzer_stop(self):
+        self.write(Neosoco.NOTE, 0)
+
+    def remote_button(self, button='1'):
+        if isinstance(button, str):
+            if button in self._REMOTE_BTN_CVT.keys():
+                if self._REMOTE_BTN_CVT[button] == self.read(Neosoco.REMOCTL):
+                    return True
+                else:
+                    return False
+            else:
+                raise ValueError('Wrong value of button')
         else:
             raise TypeError

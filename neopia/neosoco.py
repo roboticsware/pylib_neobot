@@ -58,12 +58,6 @@ class Neosoco(Robot):
     COLOR_NAME_BLUE = "blue"
     COLOR_NAME_PURPLE = "purple"
     COLOR_NAME_WHITE = "white"
-    
-    COLOR_SENSOR_WHITE = 'White'
-    COLOR_SENSOR_RED = 'Red'
-    COLOR_SENSOR_YELLOW = 'Yellow'
-    COLOR_SENSOR_GREEN = 'Green'
-    COLOR_SENSOR_BLUE = 'Blue'
 
     _COLORS = {
         "off": LED_OFF,
@@ -465,29 +459,29 @@ class Neosoco(Robot):
             elif port.lower() =='in3':
                 c_value = self.read(Neosoco.INPUT_3)
             else:
-                raise ValueError('Wrong value of port')
+                raise TypeError
             if (c_value >= 10 and c_value <= 50):
-                if (color == 'White'): 
+                if (color.lower() == self.COLOR_NAME_WHITE): 
                     return True
                 else: 
                     return False
             elif (c_value >= 51 and c_value <= 90):
-                if (color == 'Red'): 
+                if (color.lower() == self.COLOR_NAME_RED): 
                     return True
                 else: 
                     return False
             elif (c_value >= 91 and c_value <= 130):
-                if (color == 'Yellow'): 
+                if (color.lower() == self.COLOR_NAME_YELLOW): 
                     return True
                 else: 
                     return False
             elif (c_value >= 131 and c_value <= 170):
-                if (color == 'Green'): 
+                if (color.lower() == self.COLOR_NAME_GREEN): 
                     return True
                 else: 
                     return False
             elif (c_value >= 171 and c_value <= 210):
-                if (color == 'Blue'): 
+                if (color.lower() == self.COLOR_NAME_BLUE): 
                     return True
                 else: 
                     return False

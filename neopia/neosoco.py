@@ -459,7 +459,10 @@ class Neosoco(Robot):
             elif port.lower() =='in3':
                 c_value = self.read(Neosoco.INPUT_3)
             else:
-                raise TypeError
+                raise ValueError("Wrong value of port")
+
+            if not color.lower() in Neosoco._COLORS.keys():
+                raise ValueError('Wrong value of color')
             if (c_value >= 10 and c_value <= 50):
                 if (color.lower() == self.COLOR_NAME_WHITE): 
                     return True
@@ -488,7 +491,7 @@ class Neosoco(Robot):
             else:
                 return False 
         else:
-            raise ValueError('Wrong value of port or color')
+            raise TypeError
 
     def led_on(self, port='out1', brightness='100'):
         percent_cvt = {

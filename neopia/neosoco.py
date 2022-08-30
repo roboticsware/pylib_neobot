@@ -523,6 +523,13 @@ class Neosoco(Robot):
         else:
             raise TypeError
 
+    def led_by_port(self, in_port='in1', out_port='out1'):
+        if isinstance(out_port, str):
+            in_value = self._convert_scale_from_input_port(in_port, 255)
+            self._write_to_output_port(out_port, in_value)
+        else:
+            raise TypeError 
+
     def led_off(self, port='out1'):
         if isinstance(port, str):
             if port.lower() =='out1':
@@ -734,6 +741,12 @@ class Neosoco(Robot):
         else:
             raise TypeError
 
+    def servo_stop(self, port = 'out1'):
+        if isinstance(port, str):
+            self._write_to_output_port(port, self._SERVO_STOP)
+        else:
+            raise TypeError
+
     def buzzer(self, pitch='3', note='c', beats='4'):
         self.write(Neosoco.NOTE, 0) # init
         if not isinstance(pitch, str) or not (int(pitch) >= 1 and int(pitch) <= 6):
@@ -774,6 +787,9 @@ class Neosoco(Robot):
             self.write(Neosoco.NOTE, value)
         else:
             raise TypeError
+    
+    def buzzer_stop(self):
+        self.write(Neosoco.NOTE, 0)
 
     def remote_button(self, button='1'):
         if isinstance(button, str):

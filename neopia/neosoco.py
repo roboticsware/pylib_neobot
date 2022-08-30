@@ -39,37 +39,18 @@ class Neosoco(Robot):
     RIGHT_MOTOR = 0x00400009
     NOTE        = 0x0040000a
 
-    LED_OFF = 0
-    LED_BLUE = 1
-    LED_GREEN = 2
-    LED_CYAN = 3
-    LED_SKY_BLUE = 3
-    LED_RED = 4
-    LED_MAGENTA = 5
-    LED_PURPLE = 5
-    LED_YELLOW = 6
-    LED_WHITE = 7
-
-    COLOR_NAME_OFF = "off"
+    COLOR_NAME_WHITE = "white"
     COLOR_NAME_RED = "red"
     COLOR_NAME_YELLOW = "yellow"
     COLOR_NAME_GREEN = "green"
-    COLOR_NAME_SKY_BLUE = "sky blue"
     COLOR_NAME_BLUE = "blue"
-    COLOR_NAME_PURPLE = "purple"
-    COLOR_NAME_WHITE = "white"
 
     _COLORS = {
-        "off": LED_OFF,
-        "red": LED_RED,
-        "yellow": LED_YELLOW,
-        "green": LED_GREEN,
-        "sky_blue": LED_CYAN,
-        "skyblue": LED_CYAN,
-        "sky blue": LED_CYAN,
-        "blue": LED_BLUE,
-        "purple": LED_MAGENTA,
-        "white": LED_WHITE
+        "white": COLOR_NAME_WHITE,
+        "red": COLOR_NAME_RED,
+        "yellow": COLOR_NAME_YELLOW,
+        "green": COLOR_NAME_GREEN,
+        "blue": COLOR_NAME_BLUE
     }
 
     _NOTE_OFF = 0
@@ -374,6 +355,9 @@ class Neosoco(Robot):
 
     def set_value(self, port='out1', value=255):
         if isinstance(port, str) and isinstance(value, int):
+            if value < 0 or value > 255:
+                raise ValueError('Wrong value of input value')
+                
             if port.lower() =='out1':
                 self.write(Neosoco.OUTPUT_1, Util.round(value)) 
             elif port.lower() =='out2':
@@ -493,6 +477,20 @@ class Neosoco(Robot):
         else:
             raise TypeError
 
+    def _write_to_output_port(self, port, out_val):
+        if port.lower() == 'out1':
+            self.write(Neosoco.OUTPUT_1, out_val)
+        elif port.lower() == 'out2':
+            self.write(Neosoco.OUTPUT_2, out_val)
+        elif port.lower() == 'out3':
+            self.write(Neosoco.OUTPUT_3, out_val)
+        elif port.lower() == 'all':
+            self.write(Neosoco.OUTPUT_1, out_val)
+            self.write(Neosoco.OUTPUT_2, out_val)
+            self.write(Neosoco.OUTPUT_3, out_val)
+        else:
+            raise ValueError('Wrong value of out port')
+
     def led_on(self, port='out1', brightness='100'):
         percent_cvt = {
             '100': 255,
@@ -510,24 +508,14 @@ class Neosoco(Robot):
             cvt_val = percent_cvt[brightness]
         else:
             raise ValueError('Wrong value of percentage')
+
         if isinstance(port, str):
-            if port.lower() =='out1':
-                self.write(Neosoco.OUTPUT_1, cvt_val) 
-            elif port.lower() =='out2':
-                self.write(Neosoco.OUTPUT_2, cvt_val) 
-            elif port.lower() =='out3':
-                self.write(Neosoco.OUTPUT_3, cvt_val) 
-            elif port.lower() =='all':
-                self.write(Neosoco.OUTPUT_1, cvt_val) 
-                self.write(Neosoco.OUTPUT_2, cvt_val) 
-                self.write(Neosoco.OUTPUT_3, cvt_val)
-            else:
-                raise ValueError('Wrong value of port')
+            self._write_to_output_port(port, cvt_val)
         else:
             raise TypeError
 
     def led_by_port(self, in_port='in1', out_port='out1'):
-        if isinstance(out_port, str):
+        if isinstance(in_port and out_port, str):
             in_value = self._convert_scale_from_input_port(in_port, 255)
             self._write_to_output_port(out_port, in_value)
         else:
@@ -535,18 +523,7 @@ class Neosoco(Robot):
 
     def led_off(self, port='out1'):
         if isinstance(port, str):
-            if port.lower() =='out1':
-                self.write(Neosoco.OUTPUT_1, 0) 
-            elif port.lower() =='out2':
-                self.write(Neosoco.OUTPUT_2, 0) 
-            elif port.lower() =='out3':
-                self.write(Neosoco.OUTPUT_3, 0) 
-            elif port.lower() =='all':
-                self.write(Neosoco.OUTPUT_1, 0) 
-                self.write(Neosoco.OUTPUT_2, 0) 
-                self.write(Neosoco.OUTPUT_3, 0)
-            else:
-                raise ValueError('Wrong value of port')
+            self._write_to_output_port(port, 0)
         else:
             raise TypeError
 
@@ -646,20 +623,6 @@ class Neosoco(Robot):
                 raise ValueError('Wrong value of motor')
         else:
             raise TypeError
-
-    def _write_to_output_port(self, port, out_val):
-        if port.lower() == 'out1':
-            self.write(Neosoco.OUTPUT_1, out_val)
-        elif port.lower() == 'out2':
-            self.write(Neosoco.OUTPUT_2, out_val)
-        elif port.lower() == 'out3':
-            self.write(Neosoco.OUTPUT_3, out_val)
-        elif port.lower() == 'all':
-            self.write(Neosoco.OUTPUT_1, out_val)
-            self.write(Neosoco.OUTPUT_2, out_val)
-            self.write(Neosoco.OUTPUT_3, out_val)
-        else:
-            raise ValueError('Wrong value of out port')
 
     def servo_rotate(self, port='out1', direction='forward', speed='100'):
         if isinstance(port, str) and isinstance(direction, str) and isinstance(speed, str):
@@ -789,7 +752,6 @@ class Neosoco(Robot):
             value = self._convert_scale_from_input_port(port, 65)
             self.write(Neosoco.NOTE, value)
         else:
-
             raise TypeError
 
     def buzzer_stop(self):

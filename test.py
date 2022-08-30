@@ -99,3 +99,24 @@ while True:
     n.led_on() # By default value
   else:
     n.led_off()
+
+# case 14) Control LED's brightness with sensor
+# while True:
+#     n.led_by_port('out1', 'in1')
+
+# case 15) Turn off buzzer when the distance is under 10cm
+# while True:
+  # if n.get_value('in1') < 10:
+  #   n.buzzer_stop()
+  # else:
+  #   n.buzzer('2', 'c', '4')
+
+# case 16) Turn off servo motor when the distance is under 10cm
+# while True:
+  # if n.get_value('in1') < 10:
+  #   n.servo_stop('out1')
+  # else:
+  #   n.servo_rotate('out2', 'forward', '50')
+  #   wait(2000)
+  #   n.servo_rotate('out2', 'backward', '50')
+  #   wait(2000)

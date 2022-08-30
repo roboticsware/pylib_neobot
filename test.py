@@ -120,3 +120,12 @@ while True:
   #   wait(2000)
   #   n.servo_rotate('out2', 'backward', '50')
   #   wait(2000)
+
+# case 17) Turn on LED when sensor detects green color
+# while True:
+#     print(n.get_value('in1'))
+#     wait(500)
+#     if n.check_color('in1', 'Green'):
+#         n.led_on('out1', '100')
+#     else:
+#         n.led_off('out1')

@@ -491,6 +491,39 @@ class Neosoco(Robot):
         else:
             raise ValueError('Wrong value of out port')
 
+    def color_led_on(self, port='out1', red=255, blue=0, green=0):
+        if isinstance(port, str):
+            if isinstance(red and blue and green, (int, float)):
+                red = max(red, 1)
+                red = min(red, 251)
+                green = max(green, 1)
+                green = min(green, 251)
+                blue = max(blue, 1)
+                blue = min(blue, 251)
+
+                # Red
+                self._write_to_output_port(port, 252)
+                Runner.wait(100)
+                self._write_to_output_port(port, red)
+                Runner.wait(100)
+                # Green
+                self._write_to_output_port(port, 253)
+                Runner.wait(100)
+                self._write_to_output_port(port, green)
+                Runner.wait(100)
+                # Blue
+                self._write_to_output_port(port, 254)
+                Runner.wait(100)
+                self._write_to_output_port(port, blue)
+                Runner.wait(100)
+                # Accept
+                self._write_to_output_port(port, 255)
+                Runner.wait(100)
+            else:
+                raise TypeError
+        else:
+            raise TypeError
+
     def led_on(self, port='out1', brightness='100'):
         percent_cvt = {
             '100': 255,

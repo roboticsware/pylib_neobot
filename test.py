@@ -119,3 +119,7 @@ n =  Neosoco()
 #     n.led_on('out1', '100')
 #   else:
 #     n.led_off('out1')
+
+# case 15) Turn on color LED with red color during 3s
+n.color_led_on('out1', 255, 0, 0)
+wait(3000)

@@ -118,7 +118,7 @@ class NeosocoNeobot(Neobot):
         except:
             pass
 
-    def _init(self, port_name=None):
+    def _init(self, port_name=None, reg_neobots=None):
         Runner.register_required()
         self._running = True
         thread = threading.Thread(target=self._run)
@@ -128,7 +128,7 @@ class NeosocoNeobot(Neobot):
 
         tag = "Neosoco[{}]".format(self._index)
         self._connector = SerialConnector(tag, NeosocoConnectionChecker(self))
-        result = self._connector.open(port_name)
+        result = self._connector.open(port_name, reg_neobots)
         if result == Result.FOUND:
             while self._ready == False and self._is_disposed() == False:
                 time.sleep(0.01)

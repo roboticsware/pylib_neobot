@@ -166,6 +166,10 @@ class Runner(object):
         Runner._added.append(robot)
 
     @staticmethod
+    def get_robots():
+        return Runner._robots
+
+    @staticmethod
     def unregister_robot(robot):
         Runner._removed.append(robot)
 

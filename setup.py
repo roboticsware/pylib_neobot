@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
 	name="neopia",
-	version="0.1.4",
+	version="0.1.5",
 	author="RoboticsWare",
-	author_email="neopia.uz@google.ocm",
+	author_email="neopia.uz@google.com",
 	description="Python library for Neopia neobot",
 	url="https://github.com/roboticsware/pylib_neobot.git",
 	download_url="https://github.com/roboticsware/pylib_neobot/archive/refs/heads/master.zip",

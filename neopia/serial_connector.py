@@ -28,7 +28,7 @@ from neopia.connector import Result
 BAUD_RATE = 115200
 VALID_PACKET_LENGTH = 8
 RETRY = 10
-TIMEOUT = 0.4
+TIMEOUT = 0.5
 START_BYTES = bytearray([0xab, 0xcd])
 
 class SerialConnector(object):
@@ -43,17 +43,26 @@ class SerialConnector(object):
         self._timestamp = 0
         self._connected = False
 
-    def open(self, port_name=None):
+    def open(self, port_name=None, reg_robots=None):
         if port_name:
             result = self._open_port(port_name)
             if result != Result.NOT_AVAILABLE:
                 return result
         else:
+            # Get all using ports
+            if reg_robots:
+                reg_ports = []
+                [reg_ports.append(robot._neobot._connector._port_name) for robot in reg_robots]
+            # Get all ports on the computer
             ports = serial.tools.list_ports.comports()
+
             for port in ports:
-                result = self._open_port(port[0])
-                if result != Result.NOT_AVAILABLE:
-                    return result
+                if reg_ports and (port[0] in reg_ports):
+                    continue
+                else:
+                    result = self._open_port(port[0])
+                    if result != Result.NOT_AVAILABLE:
+                        return result
         self._print_error("No available USB to BLE bridge")
         return Result.NOT_AVAILABLE
 
@@ -120,7 +129,7 @@ class SerialConnector(object):
                     bufferBytes = serial.inWaiting()
                     if bufferBytes:
                         line = c + serial.read(bufferBytes)
-                        print('Recv: ', line.hex()) # For debug, temporary
+                        # print('Recv: ', line.hex()) # For debug, temporary
                         if line[:2] == start_byte: 
                             return line[:VALID_PACKET_LENGTH]
                 else:
@@ -143,7 +152,7 @@ class SerialConnector(object):
         if self._serial:
             try:
                 self._serial.write(bytes.fromhex(packet))
-                print('Sent: ', bytes.fromhex(packet)) # For debug, temporary
+                # print('Sent: ', bytes.fromhex(packet)) # For debug, temporary
             except:
                 pass
 

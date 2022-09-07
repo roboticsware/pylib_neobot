@@ -333,7 +333,7 @@ class Neosoco(Robot):
         self._add_neobot(self._neobot)
         Runner.register_robot(self)
         Runner.start()
-        self._neobot._init(port_name)
+        self._neobot._init(port_name, Runner.get_robots())
 
     def find_device_by_id(self, device_id):
         return self._neobot.find_device_by_id(device_id)
@@ -599,6 +599,7 @@ class Neosoco(Robot):
         else:
             Runner.shutdown() # The motor will not stop unless the shutdown() function is used
             raise TypeError
+        Runner.wait(100) # Since broadcast from controller is per 100ms
 
     def _convert_sacle_within_100(self, value, cvt_max_val):
         # Map to 0~limited_val from 0~100(max), it's same as Entry

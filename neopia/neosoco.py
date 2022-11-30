@@ -308,9 +308,6 @@ class Neosoco(Robot):
         self._init(port_name)
 
     def dispose(self):
-        Neosoco._robots[self.get_index()] = None
-        self._neobot._dispose()
-        Runner.unregister_robot(self)
         # Lastly send init packe to stop all action in the controller
         self.write(Neosoco.OUTPUT_1, 0) 
         self.write(Neosoco.OUTPUT_2, 0) 
@@ -318,6 +315,9 @@ class Neosoco(Robot):
         self.write(Neosoco.LEFT_MOTOR, 0) 
         self.write(Neosoco.RIGHT_MOTOR, 0) 
         self.write(Neosoco.NOTE, 0)
+        Neosoco._robots[self.get_index()] = None
+        self._neobot._dispose()
+        Runner.unregister_robot(self)
 
     def reset(self):
         self._bpm = 60

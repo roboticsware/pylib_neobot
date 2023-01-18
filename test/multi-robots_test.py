@@ -25,6 +25,7 @@ def led_blink(soco):
 
 def wag_tail(soco):
   soco.servo_rotate_by_degree('out1', 'forward', '100', '60')
+  soco.servo_rotate_by_degree('out1', 'backward', '100', '0')
   soco.servo_rotate_by_degree('out1', 'backward', '100', '60')
   soco.servo_rotate_by_degree('out1', 'forward', '100', '0')
 

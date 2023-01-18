@@ -308,7 +308,7 @@ class Neosoco(Robot):
         self._init(port_name)
 
     def dispose(self):
-        # Lastly send init packe to stop all action in the controller
+        # Lastly send init packet to stop all action in the controller
         self.write(Neosoco.OUTPUT_1, 0) 
         self.write(Neosoco.OUTPUT_2, 0) 
         self.write(Neosoco.OUTPUT_3, 0)

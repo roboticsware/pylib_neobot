@@ -204,6 +204,21 @@ class NeosocoNeobot(Neobot):
             result += self._to_hex(self._make_checksum(result)) # Checksum
         return result
 
+    def _encode_init_packet(self):
+        result = ""
+        with self._thread_lock:
+            result += START_BYTES
+            result += self._to_hex(0) # OUT1
+            result += self._to_hex(0) # OUT2
+            result += self._to_hex(0) # OUT3
+            result += self._to_hex(0) # MLA
+            result += self._to_hex(0) # MRA
+            result += self._to_hex(0) # BUZZER
+            result += self._to_hex(0) # FND
+            result += self._to_hex(0) # Not Used
+            result += self._to_hex(self._make_checksum(result)) # Checksum
+        return result
+
     def _decode_sensory_packet(self, packet):
         # packet[0]~[1] is StartBytes
         self._input_1_device._put(packet[2])

@@ -584,7 +584,7 @@ class Neosoco(Robot):
             raise TypeError
         Runner.wait(100) # Since broadcast from controller is per 100ms
         
-    def motor_stop(self, which_motor: str):
+    def motor_stop(self, which_motor='both'):
         if isinstance(which_motor, str):
             if which_motor.lower() =='right':
                 self.write(Neosoco.RIGHT_MOTOR, 0)
@@ -594,10 +594,8 @@ class Neosoco(Robot):
                 self.write(Neosoco.LEFT_MOTOR, 0)
                 self.write(Neosoco.RIGHT_MOTOR, 0)
             else:
-                Runner.shutdown() # The motor will not stop unless the shutdown() function is used
                 raise ValueError('Wrong value of motor')
         else:
-            Runner.shutdown() # The motor will not stop unless the shutdown() function is used
             raise TypeError
         Runner.wait(100) # Since broadcast from controller is per 100ms
 

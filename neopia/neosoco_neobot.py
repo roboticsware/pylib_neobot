@@ -189,7 +189,7 @@ class NeosocoNeobot(Neobot):
             return NeosocoNeobot._SPEED_TO_GAIN[speed]
         return 2
 
-    def _encode_motoring_packet(self, address):
+    def _encode_motoring_packet(self):
         result = ""
         with self._thread_lock:
             result += START_BYTES
@@ -242,7 +242,7 @@ class NeosocoNeobot(Neobot):
 
     def _send(self, connector):
         if connector:
-            packet = self._encode_motoring_packet(connector.get_address())
+            packet = self._encode_motoring_packet()
             connector.write(packet)
 
 

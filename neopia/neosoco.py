@@ -582,7 +582,6 @@ class Neosoco(Robot):
                 raise ValueError('Wrong value of direction')
         else:
             raise TypeError
-        Runner.wait(100) # Since broadcast from controller is per 100ms
         
     def motor_stop(self, which_motor='both'):
         if isinstance(which_motor, str):
@@ -597,7 +596,6 @@ class Neosoco(Robot):
                 raise ValueError('Wrong value of motor')
         else:
             raise TypeError
-        Runner.wait(100) # Since broadcast from controller is per 100ms
 
     def _convert_sacle_within_100(self, value, cvt_max_val):
         # Map to 0~limited_val from 0~100(max), it's same as Entry

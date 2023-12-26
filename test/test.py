@@ -31,7 +31,6 @@ n =  Neosoco()
 # wait(500)
 # n.motor_move('backward')
 # wait(500)
-# n.motor_move('stop')
 
 # case6) Moving control by direction keys on the keyboard
 # while True:
@@ -53,17 +52,16 @@ n =  Neosoco()
 # wait(500)
 # n.motor_rotate('both', 'backward', '30')
 # wait(500)
-# n.motor_stop('both')
 
 
 ## Buzzer, Distance sensor
 # case8) Play same note by pitch, sharp and flat, and a length of note
 # n.buzzer('3', n.NOTE_NAME_C)
 # n.buzzer('3', 'c')
-
+#
 # n.buzzer('4', n.NOTE_NAME_C_SHARP, '8')
 # n.buzzer('4', 'c#', '8')
-
+#
 # n.buzzer('5', n.NOTE_NAME_D_FLAT, '16')
 # n.buzzer('5', 'db', '16')
 
@@ -84,7 +82,7 @@ n =  Neosoco()
 #     n.led_off('out1')
 
 
-# Servo Motor
+## Servo Motor
 # case 11) Rotate servo motor forth and back with speed 50% during 5s and stop
 # n.servo_rotate('out2', 'forward', '50')
 # wait(2000)

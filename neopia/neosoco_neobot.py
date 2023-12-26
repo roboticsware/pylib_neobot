@@ -146,6 +146,9 @@ class NeosocoNeobot(Neobot):
         connector = self._connector
         self._connector = None
         if connector:
+            # Lastly send init packet to stop all action in the controller
+            self._encode_init_packet()
+            self._send(connector)
             connector.close()
 
     def _dispose(self):
@@ -188,6 +191,21 @@ class NeosocoNeobot(Neobot):
             elif speed < 1: speed = 1
             return NeosocoNeobot._SPEED_TO_GAIN[speed]
         return 2
+    
+    def _encode_init_packet(self):
+        result = ""
+        with self._thread_lock:
+            result += START_BYTES
+            result += self._to_hex(0) # OUT1
+            result += self._to_hex(0) # OUT2
+            result += self._to_hex(0) # OUT3
+            result += self._to_hex(0) # MLA
+            result += self._to_hex(0) # MRA
+            result += self._to_hex(0) # BUZZER
+            result += self._to_hex(0) # FND
+            result += self._to_hex(0) # Not Used
+            result += self._to_hex(self._make_checksum(result)) # Checksum
+        return result
 
     def _encode_motoring_packet(self):
         result = ""
@@ -199,21 +217,6 @@ class NeosocoNeobot(Neobot):
             result += self._to_hex(self._left_motor)  # MLA
             result += self._to_hex(self._right_motor) # MRA
             result += self._to_hex(self._note) # BUZZER
-            result += self._to_hex(0) # FND
-            result += self._to_hex(0) # Not Used
-            result += self._to_hex(self._make_checksum(result)) # Checksum
-        return result
-
-    def _encode_init_packet(self):
-        result = ""
-        with self._thread_lock:
-            result += START_BYTES
-            result += self._to_hex(0) # OUT1
-            result += self._to_hex(0) # OUT2
-            result += self._to_hex(0) # OUT3
-            result += self._to_hex(0) # MLA
-            result += self._to_hex(0) # MRA
-            result += self._to_hex(0) # BUZZER
             result += self._to_hex(0) # FND
             result += self._to_hex(0) # Not Used
             result += self._to_hex(self._make_checksum(result)) # Checksum

@@ -17,6 +17,7 @@
 # Boston, MA  02111-1307  USA
 
 import signal
+import atexit
 
 from neopia.scanner import Scanner
 from neopia.mode import Mode
@@ -63,8 +64,15 @@ def while_do(condition, do, args=None):
 def parallel(*functions):
     Runner.parallel(functions)
 
+# It's called when an abnormal exit as CTRL+C
 def _handle_signal(signal, frame):
     Runner.shutdown()
     raise SystemExit
 
 signal.signal(signal.SIGINT, _handle_signal)
+
+# It's called for a safe exit by sending initial packet to HW, even a normal exit
+def exit_handler():
+    Runner.shutdown()
+
+atexit.register(exit_handler)

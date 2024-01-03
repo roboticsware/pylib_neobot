@@ -21,7 +21,7 @@ import atexit
 
 from neopia.scanner import Scanner
 from neopia.mode import Mode
-from neopia.keyboard import Keyboard
+from neopia._keyboard import Keyboard
 from neopia.runner import Runner
 from neopia.model import DeviceType
 from neopia.model import DataType

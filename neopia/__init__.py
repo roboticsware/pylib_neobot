@@ -18,6 +18,7 @@
 
 import signal
 import atexit
+import sys
 
 from neopia.scanner import Scanner
 from neopia.mode import Mode
@@ -68,11 +69,11 @@ def parallel(*functions):
 def _handle_signal(signal, frame):
     Runner.shutdown()
     raise SystemExit
-
-signal.signal(signal.SIGINT, _handle_signal)
+signal.signal(signal.SIGINT, _handle_signal) # CTRL+C
+if sys.platform != "win32":
+    signal.signal(signal.SIGHUP, _handle_signal) # When kill process in VS code
 
 # It's called for a safe exit by sending initial packet to HW, even a normal exit
 def exit_handler():
     Runner.shutdown()
-
 atexit.register(exit_handler)

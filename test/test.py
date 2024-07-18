@@ -33,19 +33,26 @@ n =  Neosoco()
 # wait(500)
 
 # case6) Moving control by direction keys on the keyboard
-# while True:
-#   key = Keyboard.read()
-
+# def on_press(key): 
 #   if key == Keyboard.UP:
-#     n.motor_move('forward')
+#     print('up')
+#     n.motor_move('forward')  
 #   elif key == Keyboard.DOWN:
+#     print('down')
 #     n.motor_move('backward')
 #   elif key == Keyboard.LEFT:
+#     print('left') 
 #     n.motor_move('left')
 #   elif key == Keyboard.RIGHT:
+#     print('right')
 #     n.motor_move('right')
-#   elif key == ' ':
+#   elif key == Keyboard.SPACE:
+#     print('stop')
 #     n.motor_move('stop')
+#   elif key == Keyboard.ESC:
+#     return False
+
+# Keyboard.read(on_press)
 
 # case7) Move forth and back with speed 30% during 1s and stop
 # n.motor_rotate('both', 'forward', '30')

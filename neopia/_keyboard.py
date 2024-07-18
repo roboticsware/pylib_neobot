@@ -16,41 +16,45 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 # Boston, MA  02111-1307  USA
 
-import os
-from . import keyboard
+from pynput.keyboard import Key, Listener
 
 
 class Keyboard(object):
-    BACKSPACE = 'delete'
-    TAB = 'tab'
-    ENTER = 'enter'
-    F1 = 'f1'
-    F2 = 'f2'
-    F3 = 'f3'
-    F4 = 'f4'
-    F5 = 'f5'
-    F6 = 'f6'
-    F7 = 'f7'
-    F8 = 'f8'
-    F9 = 'f9'
-    F10 = 'f10'
-    F11 = 'f11'
-    F12 = 'f12'
+    BACKSPACE = Key.backspace
+    TAB = Key.tab
+    ESC = Key.esc
 
-    HOME = 'home'
-    UP = 'up'
-    PAGE_UP = 'page up'
-    LEFT = 'left'
-    RIGHT = 'right'
-    END = 'end'
-    DOWN = 'down'
-    PAGE_DOWN = 'page down'
-    SPACE = 'space'
-    DELETE = 'forward delete'
+    ENTER = Key.enter
+    F1 = Key.f1
+    F2 = Key.f2
+    F3 = Key.f3
+    F4 = Key.f4
+    F5 = Key.f5
+    F6 = Key.f6
+    F7 = Key.f7
+    F8 = Key.f8
+    F9 = Key.f9
+    F10 = Key.f10
+    F11 = Key.f11
+    F12 = Key.f12
+
+    HOME = Key.home
+    UP = Key.up
+    PAGE_UP = Key.page_up
+    LEFT = Key.left
+    RIGHT = Key.right
+    END = Key.end
+    DOWN = Key.down
+    PAGE_DOWN = Key.page_down
+    SPACE = Key.space
+    DELETE = Key.delete
+
+    @staticmethod
+    def _on_pressed(key):
+        print(key)
+        return key
     
     @staticmethod
-    def read():
-        event = keyboard.read_event()
-        if event.event_type == keyboard.KEY_DOWN:
-            return event.name
-        
+    def read(handler):
+        with Listener(on_press = handler) as listener:
+            listener.join()

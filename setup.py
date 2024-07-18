@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name="neopia",
-	version="0.2.4",
+	version="0.3.0",
 	author="RoboticsWare",
 	author_email="neopia.uz@google.com",
 	description="Python library for NEOPIA Neobot",
@@ -10,7 +10,7 @@ setup(
 	download_url="https://github.com/roboticsware/pylib_neobot/archive/refs/heads/master.zip",
 	long_description=open("README.md").read(),
 	long_description_content_type="text/markdown",
-	install_requires=["pyserial", "websocket-client", "keyboard"],
+	install_requires=["pyserial", "websocket-client", "pynput"],
 	packages=find_packages(exclude=["examples", "tests"]),
 	python_requires=">=3",
 	zip_safe=False,

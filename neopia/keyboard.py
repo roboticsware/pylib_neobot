@@ -16,7 +16,7 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 # Boston, MA  02111-1307  USA
 
-from pynput.keyboard import Key, Listener
+from pynput.keyboard import Key, KeyCode, Listener
 
 
 class Keyboard(object):
@@ -50,9 +50,8 @@ class Keyboard(object):
     DELETE = Key.delete
 
     @staticmethod
-    def _on_pressed(key):
-        print(key)
-        return key
+    def key_to_str(key: KeyCode):
+        return key.char
     
     @staticmethod
     def read(handler):

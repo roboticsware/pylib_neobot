@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name="neopia",
-	version="0.3.1",
+	version="0.3.2",
 	author="RoboticsWare",
 	author_email="neopia.uz@google.com",
 	description="Python library for NEOPIA Neobot",

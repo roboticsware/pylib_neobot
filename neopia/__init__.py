@@ -27,10 +27,32 @@ from neopia.runner import Runner
 from neopia.model import DeviceType
 from neopia.model import DataType
 from neopia.neosoco import Neosoco
+from neopia.ai import Camera
+from neopia.ai import FaceDetection
+from neopia.ai import Voice
 
 __version__ = "0.1.0"
 
-__all__ = ["DeviceType", "DataType", "Neosoco", "Keyboard", "scan", "is_link_mode", "link_mode", "dispose", "set_executable", "wait", "wait_until_ready", "wait_until", "when_do", "while_do", "parallel"]
+__all__ = [
+    "DeviceType", 
+    "DataType", 
+    "Neosoco", 
+    "Keyboard", 
+    "scan", 
+    "is_link_mode", 
+    "link_mode", 
+    "dispose", 
+    "set_executable", 
+    "wait", 
+    "wait_until_ready", 
+    "wait_until", 
+    "when_do", 
+    "while_do", 
+    "parallel",
+    "Camera",
+    "FaceDetection",
+    "Voice",
+]
 
 def scan():
     Scanner.scan()

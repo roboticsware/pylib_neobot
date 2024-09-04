@@ -17,11 +17,7 @@
 # Boston, MA  02111-1307  USA
 
 import cv2
-import speech_recognition as sr
-import gtts
-import uuid, os, datetime
-import playsound
-import numpy as np
+import os, datetime
 
 class Camera(object):
     def __init__(self):
@@ -62,12 +58,13 @@ class Camera(object):
             raise Exception("Camera is not opened. Please first open a camera.")
         
         dir_path = self._make_root_dir(dir_path)
-        print(f"Save frame images to ${dir_path} folder.")
+        print(f"Save frame images to {dir_path} folder.")
         print("Press 'c' to capture a frame, or press 'q' to quit.")
         captured_total = 0
 
         while True:
             _, frame = self._videoInput.read()
+            frame = cv2.flip(frame, 1)
             cv2.imshow("For capturing frames", frame)
             k = cv2.waitKey(1) & 0xff
             if k == ord('q'):  # 'q' pressed
@@ -80,55 +77,11 @@ class Camera(object):
                 print(captured_total, "frame(s) captured.")
         self.camera_close()
 
-
-class FaceDetection(Camera):
-    global frame
-    def __init__(self):
-        super().__init__()
-        print(__name__)
-        self._face_cascade = cv2.CascadeClassifier(
-            os.path.join(os.path.dirname(__file__), 'model', 'haarcascade_frontalface_default.xml'))
-
-    def start_detection(self):
-        while True:
-            _, frame = self._videoInput.read()
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = self._face_cascade.detectMultiScale(gray, 1.1, 5)
-            
-            # Show rect on faces
-            for (x, y, w, h) in faces:
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-            cv2.imshow('Face detection', frame)
-            cv2.waitKey(1)
-        
-            return len(faces)
-
-    def __del__(self):
-        super().__del__()
-
-
-class Voice(object):
-    @staticmethod
-    def stt(audioId=0, language='uz-UZ'):
-        r = sr.Recognizer()
-        mic = sr.Microphone(audioId)
-        audio = None
-        with mic:
-            r.adjust_for_ambient_noise(mic)
-            audio = r.listen(mic, 3)  # Timeout in 3 sec
-        try:
-            result = r.recognize_google(audio, language=language)
-        except sr.UnknownValueError:  # The speech is unintelligible
-            result = False
-        except Exception as error:
-            raise error
-        return result
-    
-    @staticmethod
-    def tts(text, lang='en'):
-        tts = gtts.gTTS(text=text, lang=lang)
-        fname = str(uuid.uuid1()) + ".mp3"
-        with open(fname, 'wb+') as f:
-            tts.write_to_fp(f)
-        playsound.playsound(fname)
-        os.remove(fname)
+    def get_frame(self):
+        if self._videoInput == None or self._videoInput.isOpened() == False:
+            raise Exception("Camera is not opened. Please first open a camera.")
+        _, frame = self._videoInput.read()
+        frame = cv2.flip(frame, 1)
+        cv2.imshow('Getting frame', frame)
+        cv2.waitKey(1)
+        return frame

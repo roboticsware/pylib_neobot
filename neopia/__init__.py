@@ -27,9 +27,11 @@ from neopia.runner import Runner
 from neopia.model import DeviceType
 from neopia.model import DataType
 from neopia.neosoco import Neosoco
-from neopia.ai import Camera
-from neopia.ai import FaceDetection
-from neopia.ai import Voice
+from neopia.opencv_camera import Camera
+from neopia.ai_detection import FaceDetection
+from neopia.ai_detection import FaceMeshDetection
+from neopia.ai_detection import Voice
+from neopia.ai_detection import QRDetection
 
 __version__ = "0.1.0"
 
@@ -51,7 +53,9 @@ __all__ = [
     "parallel",
     "Camera",
     "FaceDetection",
+    "FaceMeshDetection",
     "Voice",
+    "QRDetection",
 ]
 
 def scan():

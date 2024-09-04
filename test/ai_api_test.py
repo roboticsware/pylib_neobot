@@ -1,15 +1,42 @@
 from neopia import *
 
-n = Neosoco()
+# n = Neosoco()
 
-fd = FaceDetection()
-if fd.camera_open(1):
-    while True:
-        if fd.start_detection() > 0:
-            print('Kimdir kirdi!!!')
-            n.led_on()
-            n.buzzer()
-            n.led_off()
+# c = Camera()
+# if c.camera_open(1):
+#     while True:
+#         c.get_frame()
+
+
+# fd = FaceDetection()
+# if fd.camera_open(1):
+#     while True:
+#         if fd.start_detection() > 0:
+#             print('Kimdir kirdi!!!')
+            # n.led_on()
+            # n.buzzer()
+            # n.led_off()
+
+
+# fd = FaceMeshDetection()
+# if fd.camera_open(1):
+#     while True:
+#         if fd.start_detection() > 0:
+#             print('Kimdir kirdi!!!')
+            # n.led_on()
+            # n.buzzer()
+            # n.led_off()
+
+
+# qr = QRDetection()
+# if qr.camera_open(1):
+#     while True:
+#         decode_data = qr.start_detection()
+#         if decode_data:
+#             print(decode_data)
+#             n.led_on()
+#             n.buzzer()
+#             n.led_off()
 
 
 # result = False
@@ -25,8 +52,3 @@ if fd.camera_open(1):
 #             n.led_off()
 #     except:
 #         result = False
-
-
-# c = Camera()
-# if c.camera_open(1) == True:
-#     c.capture_frame('no_mask')

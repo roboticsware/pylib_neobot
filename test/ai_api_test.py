@@ -2,12 +2,14 @@ from neopia import *
 
 # n = Neosoco()
 
+### WebCam or Notebook Camera
 # c = Camera()
 # if c.camera_open(1):
 #     while True:
 #         c.get_frame()
 
 
+### Face detection
 # fd = FaceDetection()
 # if fd.camera_open(1):
 #     while True:
@@ -18,6 +20,7 @@ from neopia import *
             # n.led_off()
 
 
+### Face mesh detection
 # fd = FaceMeshDetection()
 # if fd.camera_open(1):
 #     while True:
@@ -28,6 +31,15 @@ from neopia import *
             # n.led_off()
 
 
+### Pose detection
+# pd = PoseDetection()
+# if pd.camera_open(1):
+#     while True:
+#         nose = pd.start_detection()
+#         print(nose)
+
+
+### QR code detection
 # qr = QRDetection()
 # if qr.camera_open(1):
 #     while True:
@@ -39,6 +51,7 @@ from neopia import *
 #             n.led_off()
 
 
+### Voice TTS / STT
 # result = False
 # while not result:
 #     try:    

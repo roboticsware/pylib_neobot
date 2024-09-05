@@ -16,7 +16,7 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 # Boston, MA  02111-1307  USA
 
-import sys
+import os, datetime
 
 class Util(object):
     @staticmethod
@@ -28,3 +28,20 @@ class Util(object):
                 return int(0.5 + value)
         else:
             return 0
+        
+    @staticmethod
+    def make_root_dir(path):
+        path = path.replace('\\', '/')
+        if path[-1:] != '/':
+            path += '/'
+        os.makedirs(path, exist_ok=True)
+        return path
+    
+    @staticmethod
+    def make_file_path(path, prefix_name):
+        path = path.replace('\\', '/')
+        extension = '.png'
+        name = prefix_name + "_" + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')
+        name += extension
+        path += name
+        return path

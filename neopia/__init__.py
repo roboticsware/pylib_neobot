@@ -30,8 +30,10 @@ from neopia.neosoco import Neosoco
 from neopia.opencv_camera import Camera
 from neopia.ai_detection import FaceDetection
 from neopia.ai_detection import FaceMeshDetection
-from neopia.ai_detection import Voice
+from neopia.ai_detection import PoseDetection
 from neopia.ai_detection import QRDetection
+from neopia.ai_detection import Voice
+
 
 __version__ = "0.1.0"
 
@@ -54,8 +56,9 @@ __all__ = [
     "Camera",
     "FaceDetection",
     "FaceMeshDetection",
-    "Voice",
+    "PoseDetection",
     "QRDetection",
+    "Voice",
 ]
 
 def scan():

@@ -17,17 +17,23 @@
 # Boston, MA  02111-1307  USA
 
 import cv2
-import os, datetime
+from neopia.util import Util
 
 class Camera(object):
     def __init__(self):
         self._videoInput = None
+        self._width = 0
+        self._height = 0
 
-    def camera_open(self, cameraId):
+    def camera_open(self, cameraId=0, width=640, height=480):
         # Open the a camera, the index of default camera is 0
         self._videoInput = cv2.VideoCapture(cameraId)
         if self._videoInput.isOpened() == False:
             raise Exception("Camera is not opened.")
+        self._width = width
+        self._height = height
+        self._videoInput.set(cv2.CAP_PROP_FRAME_WIDTH, self._width)
+        self._videoInput.set(cv2.CAP_PROP_FRAME_HEIGHT, self._height)
         return True
 
     def camera_close(self):
@@ -37,27 +43,20 @@ class Camera(object):
     def __del__(self):
         self.camera_close()
 
-    def _make_root_dir(self, path):
-        path = path.replace('\\', '/')
-        if path[-1:] != '/':
-            path += '/'
-        os.makedirs(path, exist_ok=True)
-        return path
-    
-    def _make_file_path(self, path, prefix_name):
-        path = path.replace('\\', '/')
-        extension = '.png'
-        name = prefix_name + "_" + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')
-        file_list = os.listdir(path)
-        name += extension
-        path += name
-        return path
+    def get_frame(self):
+        if self._videoInput == None or self._videoInput.isOpened() == False:
+            raise Exception("Camera is not opened. Please first open a camera.")
+        _, frame = self._videoInput.read()
+        frame = cv2.flip(frame, 1)
+        # cv2.imshow('Getting frame', frame)
+        # cv2.waitKey(1)
+        return frame
 
     def capture_frame(self, dir_path):
         if self._videoInput == None or self._videoInput.isOpened() == False:
             raise Exception("Camera is not opened. Please first open a camera.")
         
-        dir_path = self._make_root_dir(dir_path)
+        dir_path = Util.make_root_dir(dir_path)
         print(f"Save frame images to {dir_path} folder.")
         print("Press 'c' to capture a frame, or press 'q' to quit.")
         captured_total = 0
@@ -70,18 +69,9 @@ class Camera(object):
             if k == ord('q'):  # 'q' pressed
                 break
             elif k == ord('c'):  # 'c' pressed
-                img_name = self._make_file_path(dir_path, 'photo')
+                img_name = Util.make_file_path(dir_path, 'photo')
                 cv2.imwrite(img_name, frame)
                 print(img_name, "saved.")
                 captured_total += 1
                 print(captured_total, "frame(s) captured.")
         self.camera_close()
-
-    def get_frame(self):
-        if self._videoInput == None or self._videoInput.isOpened() == False:
-            raise Exception("Camera is not opened. Please first open a camera.")
-        _, frame = self._videoInput.read()
-        frame = cv2.flip(frame, 1)
-        cv2.imshow('Getting frame', frame)
-        cv2.waitKey(1)
-        return frame

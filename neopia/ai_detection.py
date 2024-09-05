@@ -26,6 +26,8 @@ import mediapipe as mp
 
 mp_drawing = mp.solutions.drawing_utils
 mp_face_mesh = mp.solutions.face_mesh
+mp_pose = mp.solutions.pose
+pose = mp_pose.Pose()
 
 # For face mesh:
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
@@ -35,13 +37,13 @@ class FaceMeshDetection(Camera):
     def __init__(self):
         super().__init__()
 
-    def start_detection(self):
-        result = False
+    def start_detection(self, just_rtn_frame=False):
+        rtn_val = False
         _, frame = self._videoInput.read()
         frame = cv2.flip(frame, 1)
         results = face_mesh.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
 
-        # Print and draw face mesh landmarks on the image.
+        # Draw face mesh landmarks on the image.
         if results.multi_face_landmarks:
             annotated_image = frame.copy()
             for face_landmarks in results.multi_face_landmarks:
@@ -51,15 +53,25 @@ class FaceMeshDetection(Camera):
                     connections=mp_face_mesh.FACEMESH_CONTOURS,
                     landmark_drawing_spec=drawing_spec,
                     connection_drawing_spec=drawing_spec)
-            # Show mesh on faces
-            cv2.imshow('Face detection', annotated_image)
-            result = True
+            
+            # Just return frame
+            if just_rtn_frame:
+                return annotated_image 
+            else:
+                # Show mesh on faces
+                cv2.imshow('Face detection', annotated_image)
+                cv2.waitKey(1)
+                rtn_val = True
         else:
-            cv2.imshow('Face detection', frame)
-            result = False
-        cv2.waitKey(1)
+            # Just return frame
+            if just_rtn_frame:
+                return frame
+            else:
+                cv2.imshow('Face detection', frame)
+                cv2.waitKey(1)
+                rtn_val = False
     
-        return result
+        return rtn_val
 
     def __del__(self):
         super().__del__()
@@ -71,7 +83,7 @@ class FaceDetection(Camera):
         self._face_cascade = cv2.CascadeClassifier(
             os.path.join(os.path.dirname(__file__), 'model', 'haarcascade_frontalface_default.xml'))
 
-    def start_detection(self):
+    def start_detection(self, just_rtn_frame=False):
         _, frame = self._videoInput.read()
         frame = cv2.flip(frame, 1)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -80,10 +92,50 @@ class FaceDetection(Camera):
         # Show rect on faces
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-        cv2.imshow('Face detection', frame)
-        cv2.waitKey(1)
+
+        # Just return frame
+        if just_rtn_frame:
+            return (frame, len(faces))
+        else:
+            cv2.imshow('Face detection', frame)
+            cv2.waitKey(1)
     
         return len(faces)
+
+    def __del__(self):
+        super().__del__()
+
+
+class PoseDetection(Camera):
+    def __init__(self):
+        super().__init__()
+
+    def start_detection(self, just_rtn_frame=False):
+        rtn_val = (0, 0)  # Tuple
+        success, frame = self._videoInput.read()
+        if success is False:
+            print("Frame is not ready!")
+            return rtn_val
+        frame = cv2.flip(frame, 1) 
+        result = pose.process(frame)
+        if result.pose_landmarks:
+            # Save the coords of nose
+            rtn_val = (result.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].x * self._width,
+                        result.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].y * self._height)
+        
+            #Draw the framework of body onto the processed image and then show it in the preview window
+            mp_drawing.draw_landmarks(frame,result.pose_landmarks,mp_pose.POSE_CONNECTIONS)
+        else:
+            rtn_val = (0, 0)
+
+        # Just return frame
+        if just_rtn_frame:
+            return (frame, rtn_val)
+        else:
+            cv2.imshow('Pose detection', frame)
+            cv2.waitKey(1)
+    
+        return rtn_val
 
     def __del__(self):
         super().__del__()
@@ -94,7 +146,7 @@ class QRDetection(Camera):
         super().__init__()
         self._detector = cv2.QRCodeDetector()
 
-    def start_detection(self):
+    def start_detection(self, just_rtn_frame=False):
         _, frame = self._videoInput.read()
         frame = cv2.flip(frame, 1)
         data, bbox, _ = self._detector.detectAndDecode(frame)
@@ -107,8 +159,13 @@ class QRDetection(Camera):
                         color=(255, 0, 0), thickness=2)
                 cv2.putText(frame, data, (bb_pts[0][0], bb_pts[0][1] - 10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)        
-        cv2.imshow('QR detection', frame)
-        cv2.waitKey(1)
+                
+        # Just return frame
+        if just_rtn_frame:
+            return (frame, data)
+        else:
+            cv2.imshow('QR detection', frame)
+            cv2.waitKey(1)
         return data
 
     def __del__(self):
@@ -140,5 +197,3 @@ class Voice(object):
             tts.write_to_fp(f)
         playsound.playsound(fname)
         os.remove(fname)
-
-

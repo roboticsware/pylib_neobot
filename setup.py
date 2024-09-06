@@ -23,6 +23,7 @@ setup(
         "mediapipe",
 	],
 	packages=find_packages(exclude=["examples", "tests"]),
+    package_data={'neopia': ['model/*.*']},
 	python_requires=">=3",
 	zip_safe=False,
 	classifiers=[

@@ -23,6 +23,9 @@ import uuid, os
 import playsound
 from neopia.opencv_camera import Camera
 import mediapipe as mp
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
+from neopia.ai_util import AiUtil
 
 mp_drawing = mp.solutions.drawing_utils
 mp_face_mesh = mp.solutions.face_mesh
@@ -113,7 +116,7 @@ class PoseDetection(Camera):
     def start_detection(self, just_rtn_frame=False):
         rtn_val = (0, 0)  # Tuple
         success, frame = self._videoInput.read()
-        if success is False:
+        if not success:
             print("Frame is not ready!")
             return rtn_val
         frame = cv2.flip(frame, 1) 
@@ -135,6 +138,62 @@ class PoseDetection(Camera):
             cv2.imshow('Pose detection', frame)
             cv2.waitKey(1)
     
+        return rtn_val
+
+    def __del__(self):
+        super().__del__()
+
+
+class ObjectDetection(Camera):
+    def __init__(self):
+        super().__init__()
+        self._detection_result_list = []
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'efficientdet.tflite')
+        # Initialize the object detection model
+        # model_asset_buffer is from https://github.com/google-ai-edge/mediapipe/issues/4983
+        base_options = python.BaseOptions(model_asset_buffer = open(model_path, "rb").read())
+        options = vision.ObjectDetectorOptions(base_options=base_options,
+                                                running_mode=vision.RunningMode.LIVE_STREAM,
+                                                score_threshold=0.5,
+                                                result_callback=self._visualize_callback)
+        self._detector = vision.ObjectDetector.create_from_options(options)
+        self._counter = 0
+
+    def _visualize_callback(self, result,
+                         output_image: mp.Image, timestamp_ms: int):
+        result.timestamp_ms = timestamp_ms
+        self._detection_result_list.append(result)
+
+    def start_detection(self, just_rtn_frame=False):
+        rtn_val = None
+        _, frame = self._videoInput.read()
+        self._counter += 1
+        frame = cv2.flip(frame, 1)
+
+        # Convert the image from BGR to RGB as required by the TFLite model.
+        rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+
+        # Run object detection using the model.
+        self._detector.detect_async(mp_image, self._counter)
+        current_frame = mp_image.numpy_view()
+        current_frame = cv2.cvtColor(current_frame, cv2.COLOR_RGB2BGR)
+
+        if self._detection_result_list:
+            vis_image, obj_name = AiUtil.draw_boundingbox(current_frame, self._detection_result_list[0])
+            rtn_val = obj_name
+            self._detection_result_list.clear()
+    
+            # Just return frame
+            if just_rtn_frame:
+                return (vis_image, rtn_val)
+            else:
+                cv2.imshow('Object detection', vis_image)
+                cv2.waitKey(1)
+        else:
+            cv2.imshow('Object detection', current_frame)
+            cv2.waitKey(1)
+
         return rtn_val
 
     def __del__(self):

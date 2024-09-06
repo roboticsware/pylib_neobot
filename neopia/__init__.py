@@ -32,6 +32,7 @@ from neopia.ai_detection import FaceDetection
 from neopia.ai_detection import FaceMeshDetection
 from neopia.ai_detection import PoseDetection
 from neopia.ai_detection import QRDetection
+from neopia.ai_detection import ObjectDetection
 from neopia.ai_detection import Voice
 
 
@@ -58,6 +59,7 @@ __all__ = [
     "FaceMeshDetection",
     "PoseDetection",
     "QRDetection",
+    "ObjectDetection",
     "Voice",
 ]
 

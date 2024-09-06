@@ -39,6 +39,14 @@ from neopia import *
 #         print(nose)
 
 
+### Object detection
+od = ObjectDetection()
+if od.camera_open(1):
+    while True:
+        obj = od.start_detection()
+        print(obj)
+
+
 ### QR code detection
 # qr = QRDetection()
 # if qr.camera_open(1):
@@ -65,3 +73,4 @@ from neopia import *
 #             n.led_off()
 #     except:
 #         result = False
+

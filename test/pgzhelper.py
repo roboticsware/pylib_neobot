@@ -1423,6 +1423,14 @@ class Actor(Actor):
 
     def get_rect(self):
         return self._rect
+    
+    def say(self, text, width=120, height=50, fgcolor='black', bgcolor='white', **kwargs):
+        tsurf, tpos = ptext.drawbox(text, (self.left, self.top - 60, width, height),
+                                    color=fgcolor, background=bgcolor, **kwargs)
+        pygame.display.update()
+        tsurf.set_alpha(255)  # 255 means opaque
+        game.screen.blit(tsurf, tpos)
+        pygame.display.update()
 
     def say_for_sec(self, text, seconds, fgcolor='black', bgcolor='white', **kwargs):
         tsurf, tpos = ptext.drawbox(text, (self.left, self.top - 60, 120, 50),

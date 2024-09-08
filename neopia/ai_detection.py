@@ -19,7 +19,7 @@
 import cv2
 import speech_recognition as sr
 import gtts
-import uuid, os
+import uuid, os, time
 import playsound
 from neopia.opencv_camera import Camera
 import mediapipe as mp
@@ -27,6 +27,8 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from neopia.ai_util import AiUtil
 
+mp_hands = mp.solutions.hands
+mp_drawing_styles = mp.solutions.drawing_styles
 mp_drawing = mp.solutions.drawing_utils
 mp_face_mesh = mp.solutions.face_mesh
 mp_pose = mp.solutions.pose
@@ -117,7 +119,7 @@ class PoseDetection(Camera):
         rtn_val = (0, 0)  # Tuple
         success, frame = self._videoInput.read()
         if not success:
-            print("Frame is not ready!")
+            print("Frame is not ready!, Try again.")
             return rtn_val
         frame = cv2.flip(frame, 1) 
         result = pose.process(frame)
@@ -183,13 +185,11 @@ class ObjectDetection(Camera):
             vis_image, obj_name = AiUtil.draw_boundingbox(current_frame, self._detection_result_list[0])
             rtn_val = obj_name
             self._detection_result_list.clear()
-    
-            # Just return frame
-            if just_rtn_frame:
-                return (vis_image, rtn_val)
-            else:
-                cv2.imshow('Object detection', vis_image)
-                cv2.waitKey(1)
+            current_frame = vis_image
+            
+        # Just return frame
+        if just_rtn_frame:
+            return (current_frame, rtn_val)
         else:
             cv2.imshow('Object detection', current_frame)
             cv2.waitKey(1)
@@ -198,6 +198,64 @@ class ObjectDetection(Camera):
 
     def __del__(self):
         super().__del__()
+
+
+class GestureDetection(Camera):
+    def __init__(self):
+        super().__init__()
+        self._detection_result_list = []
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'gesture_recognizer.task')
+        # Initialize the object detection model
+        # model_asset_buffer is from https://github.com/google-ai-edge/mediapipe/issues/4983
+        base_options = python.BaseOptions(model_asset_buffer = open(model_path, "rb").read())
+        options = vision.GestureRecognizerOptions(base_options=base_options,
+                                                running_mode=vision.RunningMode.LIVE_STREAM,
+                                                result_callback=self._visualize_callback)
+        self._detector = vision.GestureRecognizer.create_from_options(options)
+
+    def _visualize_callback(self, result,
+                         output_image: mp.Image, timestamp_ms: int):
+        result.timestamp_ms = timestamp_ms
+        self._detection_result_list.append(result)
+
+    def start_detection(self, just_rtn_frame=False):
+        rtn_val = None
+        success, frame = self._videoInput.read()
+        if not success:
+            print("Frame is not ready!, Try again.")
+            return rtn_val
+        frame = cv2.flip(frame, 1)
+
+        # Convert the image from BGR to RGB as required by the TFLite model.
+        rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+
+        # Run object detection using the model.
+        self._detector.recognize_async(mp_image, time.time_ns() // 1_000_000)
+        current_frame = frame
+
+        if self._detection_result_list:
+            hand_landmarks_proto, category_name = AiUtil.get_handlandmarks(current_frame, self._detection_result_list[0])
+            rtn_val = category_name
+            mp_drawing.draw_landmarks(
+                current_frame,
+                hand_landmarks_proto,
+                mp_hands.HAND_CONNECTIONS,
+                mp_drawing_styles.get_default_hand_landmarks_style(),
+                mp_drawing_styles.get_default_hand_connections_style())
+            self._detection_result_list.clear()
+    
+        # Just return frame
+        if just_rtn_frame:
+            return (current_frame, rtn_val)
+        else:
+            cv2.imshow('Object detection', current_frame)
+            cv2.waitKey(1)
+        
+        return rtn_val
+
+    def __del__(self):
+        super().__del__()        
 
 
 class QRDetection(Camera):
@@ -231,6 +289,14 @@ class QRDetection(Camera):
         super().__del__()
 
 
+import threading
+shared_fname = None
+tl = threading.Lock()
+def thread_run(lock):
+    lock.acquire()
+    playsound.playsound(shared_fname, block=True)
+    lock.release()
+
 class Voice(object):
     @staticmethod
     def stt(audioId=0, language='uz-UZ'):
@@ -256,3 +322,10 @@ class Voice(object):
             tts.write_to_fp(f)
         playsound.playsound(fname)
         os.remove(fname)
+
+    @staticmethod
+    def playsound(fname):
+        global shared_fname
+        shared_fname = fname
+        thread = threading.Thread(target=thread_run, args=(tl,))
+        thread.start()

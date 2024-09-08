@@ -1,6 +1,6 @@
 from neopia import *
 
-# n = Neosoco()
+n = Neosoco()
 
 ### WebCam or Notebook Camera
 # c = Camera()
@@ -40,11 +40,28 @@ from neopia import *
 
 
 ### Object detection
-od = ObjectDetection()
-if od.camera_open(1):
+# od = ObjectDetection()
+# if od.camera_open(1):
+#     while True:
+#         obj = od.start_detection()
+#         print(obj)
+
+
+## Gesture detection
+gd = GestureDetection()
+if gd.camera_open(1):
     while True:
-        obj = od.start_detection()
-        print(obj)
+        category = gd.start_detection()
+        if category == "Open_Palm":
+            n.motor_move('forward')  
+        elif category == "Closed_Fist":
+            n.motor_stop()
+        elif category == "Thumb_Up":
+            n.motor_move('right')
+        elif category == "Thumb_Down":
+            n.motor_move('left')
+        elif category == "Pointing_Up":
+            n.motor_move('backward')
 
 
 ### QR code detection
@@ -73,4 +90,3 @@ if od.camera_open(1):
 #             n.led_off()
 #     except:
 #         result = False
-

@@ -29,7 +29,7 @@ class Camera(object):
         # Open the a camera, the index of default camera is 0
         self._videoInput = cv2.VideoCapture(cameraId)
         if self._videoInput.isOpened() == False:
-            raise Exception("Camera is not opened.")
+            raise Exception("Camera is not opened. Check your camera id.")
         self._width = width
         self._height = height
         self._videoInput.set(cv2.CAP_PROP_FRAME_WIDTH, self._width)

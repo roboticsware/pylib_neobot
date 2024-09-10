@@ -2,38 +2,31 @@ from neopia import *
 
 n = Neosoco()
 
-### WebCam or Notebook Camera
-# c = Camera()
-# if c.camera_open(1):
-#     while True:
-#         c.get_frame()
-
-
 ### Face detection
 # fd = FaceDetection()
-# if fd.camera_open(1):
+# if fd.camera_open(0):
 #     while True:
 #         if fd.start_detection() > 0:
 #             print('Kimdir kirdi!!!')
-            # n.led_on()
-            # n.buzzer()
-            # n.led_off()
+#             n.led_on()
+#             n.buzzer()
+#             n.led_off()
 
 
 ### Face mesh detection
 # fd = FaceMeshDetection()
-# if fd.camera_open(1):
+# if fd.camera_open(0):
 #     while True:
 #         if fd.start_detection() > 0:
 #             print('Kimdir kirdi!!!')
-            # n.led_on()
-            # n.buzzer()
-            # n.led_off()
+#             n.led_on()
+#             n.buzzer()
+#             n.led_off()
 
 
 ### Pose detection
 # pd = PoseDetection()
-# if pd.camera_open(1):
+# if pd.camera_open(0):
 #     while True:
 #         nose = pd.start_detection()
 #         print(nose)
@@ -41,15 +34,25 @@ n = Neosoco()
 
 ### Object detection
 # od = ObjectDetection()
-# if od.camera_open(1):
+# if od.camera_open(0):
 #     while True:
 #         obj = od.start_detection()
 #         print(obj)
 
 
-## Gesture detection
+# import sys, keyboard
+# def on_press(key): 
+#     if key == Keyboard.ESC:
+#     #   sys.exit()
+#         return False
+    
+# def on_space():
+#     print("pressed")
+#     sys.exit()
+# keyboard.add_hotkey('space', on_space)
+
 gd = GestureDetection()
-if gd.camera_open(1):
+if gd.camera_open(0):
     while True:
         category = gd.start_detection()
         if category == "Open_Palm":
@@ -77,6 +80,7 @@ if gd.camera_open(1):
 
 
 ### Voice TTS / STT
+# import time
 # result = False
 # while not result:
 #     try:    
@@ -86,7 +90,9 @@ if gd.camera_open(1):
 #         print(result)
 #         if result == "Chiroqni yoq":
 #             n.led_on()
+#             time.sleep(3)
 #         elif result == "Chiroqni o'chir":
 #             n.led_off()
+#             time.sleep(3)
 #     except:
 #         result = False

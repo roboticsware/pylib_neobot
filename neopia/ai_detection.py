@@ -59,22 +59,17 @@ class FaceMeshDetection(Camera):
                     landmark_drawing_spec=drawing_spec,
                     connection_drawing_spec=drawing_spec)
             
-            # Just return frame
-            if just_rtn_frame:
-                return annotated_image 
-            else:
-                # Show mesh on faces
-                cv2.imshow('Face detection', annotated_image)
-                cv2.waitKey(1)
-                rtn_val = True
+            frame = annotated_image 
+            rtn_val = True
+        
+        # Just return frame
+        if just_rtn_frame:
+            return frame
         else:
-            # Just return frame
-            if just_rtn_frame:
-                return frame
-            else:
-                cv2.imshow('Face detection', frame)
-                cv2.waitKey(1)
-                rtn_val = False
+            cv2.imshow('Face detection', frame)
+            if cv2.waitKey(1) == 27:  # ESC pressed
+                os._exit(1)
+            rtn_val = False
     
         return rtn_val
 
@@ -103,7 +98,8 @@ class FaceDetection(Camera):
             return (frame, len(faces))
         else:
             cv2.imshow('Face detection', frame)
-            cv2.waitKey(1)
+            if cv2.waitKey(1) == 27:  # ESC pressed
+                os._exit(1)
     
         return len(faces)
 
@@ -138,7 +134,8 @@ class PoseDetection(Camera):
             return (frame, rtn_val)
         else:
             cv2.imshow('Pose detection', frame)
-            cv2.waitKey(1)
+            if cv2.waitKey(1) == 27:  # ESC pressed
+                os._exit(1)
     
         return rtn_val
 
@@ -192,7 +189,8 @@ class ObjectDetection(Camera):
             return (current_frame, rtn_val)
         else:
             cv2.imshow('Object detection', current_frame)
-            cv2.waitKey(1)
+            if cv2.waitKey(1) == 27:  # ESC pressed
+                os._exit(1)
 
         return rtn_val
 
@@ -249,8 +247,9 @@ class GestureDetection(Camera):
         if just_rtn_frame:
             return (current_frame, rtn_val)
         else:
-            cv2.imshow('Object detection', current_frame)
-            cv2.waitKey(1)
+            cv2.imshow('Gesture detection', current_frame)
+            if cv2.waitKey(1) == 27:  # ESC pressed
+                os._exit(1)
         
         return rtn_val
 
@@ -282,7 +281,8 @@ class QRDetection(Camera):
             return (frame, data)
         else:
             cv2.imshow('QR detection', frame)
-            cv2.waitKey(1)
+            if cv2.waitKey(1) == 27:  # ESC pressed
+                os._exit(1)
         return data
 
     def __del__(self):

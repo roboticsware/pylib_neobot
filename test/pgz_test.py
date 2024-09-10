@@ -11,7 +11,7 @@ pygame_img = None
 
 #### Camera
 # c = Camera()
-# if c.camera_open(1) is False:
+# if c.camera_open(0) is False:
 #     game.exit()
 
 # def draw():
@@ -31,7 +31,7 @@ pygame_img = None
 # red_led.fps = 15
 
 # fd = FaceDetection()
-# if fd.camera_open(1) is False:
+# if fd.camera_open(0) is False:
 #     game.exit()
 
 # def draw():
@@ -66,7 +66,7 @@ pygame_img = None
 
 #### Face mesh detection
 # fd = FaceMeshDetection()
-# if fd.camera_open(1) is False:
+# if fd.camera_open(0) is False:
 #     game.exit()
 
 # def draw():
@@ -80,7 +80,7 @@ pygame_img = None
 
 #### Object detection
 # od = ObjectDetection()
-# if od.camera_open(1) is False:
+# if od.camera_open(0) is False:
 #     game.exit()
 
 # def draw():
@@ -99,7 +99,7 @@ pygame_img = None
 # soch.scale = 0.3
 
 # pd = PoseDetection()
-# if pd.camera_open(1) is False:
+# if pd.camera_open(0) is False:
 #     game.exit()
 
 # def draw():
@@ -125,7 +125,7 @@ entrybot.scale = 0.5
 
 category = None
 gd = GestureDetection()
-if gd.camera_open(1) is False:
+if gd.camera_open(0) is False:
     game.exit()
 
 def draw():

@@ -264,7 +264,6 @@ class QRDetection(Camera):
 
     def start_detection(self, just_rtn_frame=False):
         _, frame = self._videoInput.read()
-        frame = cv2.flip(frame, 1)
         data, bbox, _ = self._detector.detectAndDecode(frame)
 
         if bbox is not None:

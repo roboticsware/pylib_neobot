@@ -26,6 +26,7 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from neopia.ai_util import AiUtil
+import time #for fps control
 
 mp_hands = mp.solutions.hands
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -144,7 +145,7 @@ class PoseDetection(Camera):
 
 
 class ObjectDetection(Camera):
-    def __init__(self):
+    def __init__(self, target_fps=30):
         super().__init__()
         self._detection_result_list = []
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'efficientdet.tflite')
@@ -158,12 +159,20 @@ class ObjectDetection(Camera):
         self._detector = vision.ObjectDetector.create_from_options(options)
         self._counter = 0
 
+        self.target_fps = target_fps
+        self.prev_time = 0
+
     def _visualize_callback(self, result,
                          output_image: mp.Image, timestamp_ms: int):
         result.timestamp_ms = timestamp_ms
         self._detection_result_list.append(result)
 
     def start_detection(self, just_rtn_frame=False):
+        current_time = time.time()
+        # Limiting framerate
+        if (current_time - self.prev_time) < 1.0 / self.target_fps:
+            return None
+        
         rtn_val = None
         _, frame = self._videoInput.read()
         self._counter += 1
@@ -192,6 +201,9 @@ class ObjectDetection(Camera):
             if cv2.waitKey(1) == 27:  # ESC pressed
                 os._exit(1)
 
+        # Update the previous time after processing the frame
+        self.prev_time = current_time
+
         return rtn_val
 
     def __del__(self):
@@ -199,7 +211,7 @@ class ObjectDetection(Camera):
 
 
 class GestureDetection(Camera):
-    def __init__(self):
+    def __init__(self, target_fps=30):
         super().__init__()
         self._detection_result_list = []
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'gesture_recognizer.task')
@@ -211,12 +223,20 @@ class GestureDetection(Camera):
                                                 result_callback=self._visualize_callback)
         self._detector = vision.GestureRecognizer.create_from_options(options)
 
+        self.target_fps = target_fps
+        self.prev_time = 0
+
     def _visualize_callback(self, result,
                          output_image: mp.Image, timestamp_ms: int):
         result.timestamp_ms = timestamp_ms
         self._detection_result_list.append(result)
 
     def start_detection(self, just_rtn_frame=False):
+        current_time = time.time()
+        # Limiting framerate
+        if (current_time - self.prev_time) < 1.0 / self.target_fps:
+            return None
+        
         rtn_val = None
         success, frame = self._videoInput.read()
         if not success:
@@ -250,6 +270,9 @@ class GestureDetection(Camera):
             cv2.imshow('Gesture detection', current_frame)
             if cv2.waitKey(1) == 27:  # ESC pressed
                 os._exit(1)
+
+        # Update the previous time after processing the frame
+        self.prev_time = current_time
         
         return rtn_val
 

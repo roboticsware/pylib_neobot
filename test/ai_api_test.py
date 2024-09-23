@@ -1,6 +1,5 @@
 from neopia import *
 
-n = Neosoco()
 
 ### Face detection
 # fd = FaceDetection()
@@ -33,7 +32,7 @@ n = Neosoco()
 
 
 ### Object detection
-# od = ObjectDetection()
+# od = ObjectDetection(target_fps=5)
 # if od.camera_open(0):
 #     while True:
 #         obj = od.start_detection()
@@ -51,7 +50,7 @@ n = Neosoco()
 #     sys.exit()
 # keyboard.add_hotkey('space', on_space)
 
-gd = GestureDetection()
+gd = GestureDetection(target_fps=12)
 if gd.camera_open(0):
     while True:
         category = gd.start_detection()

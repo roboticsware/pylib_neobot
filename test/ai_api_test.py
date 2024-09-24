@@ -1,5 +1,6 @@
 from neopia import *
 
+n = Neosoco()
 
 ### Face detection
 # fd = FaceDetection()
@@ -32,38 +33,38 @@ from neopia import *
 
 
 ### Object detection
-# od = ObjectDetection(target_fps=5)
-# if od.camera_open(0):
-#     while True:
-#         obj = od.start_detection()
-#         print(obj)
-
-
-# import sys, keyboard
-# def on_press(key): 
-#     if key == Keyboard.ESC:
-#     #   sys.exit()
-#         return False
-    
-# def on_space():
-#     print("pressed")
-#     sys.exit()
-# keyboard.add_hotkey('space', on_space)
-
-gd = GestureDetection(target_fps=12)
-if gd.camera_open(0):
+od = ObjectDetection(target_fps=10) 
+if od.camera_open(0):
     while True:
-        category = gd.start_detection()
-        if category == "Open_Palm":
-            n.motor_move('forward')  
-        elif category == "Closed_Fist":
-            n.motor_stop()
-        elif category == "Thumb_Up":
-            n.motor_move('right')
-        elif category == "Thumb_Down":
-            n.motor_move('left')
-        elif category == "Pointing_Up":
-            n.motor_move('backward')
+        obj = od.start_detection()
+        print(obj)
+
+
+import sys, keyboard
+def on_press(key): 
+    if key == Keyboard.ESC:
+    #   sys.exit()
+        return False
+    
+def on_space():
+    print("pressed")
+    sys.exit()
+keyboard.add_hotkey('space', on_space)
+
+# gd = GestureDetection(target_fps=10)
+# if gd.camera_open(0):
+#     while True:
+#         category = gd.start_detection()
+#         if category == "Open_Palm":
+#             n.motor_move('forward')  
+#         elif category == "Closed_Fist":
+#             n.motor_stop()
+#         elif category == "Thumb_Up":
+#             n.motor_move('right')
+#         elif category == "Thumb_Down":
+#             n.motor_move('left')
+#         elif category == "Pointing_Up":
+#             n.motor_move('backward')
 
 
 ### QR code detection

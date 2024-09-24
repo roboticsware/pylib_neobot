@@ -26,7 +26,6 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from neopia.ai_util import AiUtil
-import time #for fps control
 
 mp_hands = mp.solutions.hands
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -192,6 +191,9 @@ class ObjectDetection(Camera):
             rtn_val = obj_name
             self._detection_result_list.clear()
             current_frame = vis_image
+        
+        # Update the previous time after processing the frame
+        self.prev_time = current_time
             
         # Just return frame
         if just_rtn_frame:
@@ -200,9 +202,6 @@ class ObjectDetection(Camera):
             cv2.imshow('Object detection', current_frame)
             if cv2.waitKey(1) == 27:  # ESC pressed
                 os._exit(1)
-
-        # Update the previous time after processing the frame
-        self.prev_time = current_time
 
         return rtn_val
 
@@ -263,6 +262,9 @@ class GestureDetection(Camera):
                 mp_drawing_styles.get_default_hand_connections_style())
             self._detection_result_list.clear()
     
+        # Update the previous time after processing the frame
+        self.prev_time = current_time
+
         # Just return frame
         if just_rtn_frame:
             return (current_frame, rtn_val)
@@ -270,9 +272,6 @@ class GestureDetection(Camera):
             cv2.imshow('Gesture detection', current_frame)
             if cv2.waitKey(1) == 27:  # ESC pressed
                 os._exit(1)
-
-        # Update the previous time after processing the frame
-        self.prev_time = current_time
         
         return rtn_val
 

@@ -144,7 +144,7 @@ class PoseDetection(Camera):
 
 
 class ObjectDetection(Camera):
-    def __init__(self):
+    def __init__(self, target_fps=30):
         super().__init__()
         self._detection_result_list = []
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'efficientdet.tflite')
@@ -158,12 +158,20 @@ class ObjectDetection(Camera):
         self._detector = vision.ObjectDetector.create_from_options(options)
         self._counter = 0
 
+        self.target_fps = target_fps
+        self.prev_time = 0
+
     def _visualize_callback(self, result,
                          output_image: mp.Image, timestamp_ms: int):
         result.timestamp_ms = timestamp_ms
         self._detection_result_list.append(result)
 
     def start_detection(self, just_rtn_frame=False):
+        current_time = time.time()
+        # Limiting framerate
+        if (current_time - self.prev_time) < 1.0 / self.target_fps:
+            return None
+        
         rtn_val = None
         _, frame = self._videoInput.read()
         self._counter += 1
@@ -183,6 +191,9 @@ class ObjectDetection(Camera):
             rtn_val = obj_name
             self._detection_result_list.clear()
             current_frame = vis_image
+        
+        # Update the previous time after processing the frame
+        self.prev_time = current_time
             
         # Just return frame
         if just_rtn_frame:
@@ -199,7 +210,7 @@ class ObjectDetection(Camera):
 
 
 class GestureDetection(Camera):
-    def __init__(self):
+    def __init__(self, target_fps=30):
         super().__init__()
         self._detection_result_list = []
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'gesture_recognizer.task')
@@ -211,12 +222,20 @@ class GestureDetection(Camera):
                                                 result_callback=self._visualize_callback)
         self._detector = vision.GestureRecognizer.create_from_options(options)
 
+        self.target_fps = target_fps
+        self.prev_time = 0
+
     def _visualize_callback(self, result,
                          output_image: mp.Image, timestamp_ms: int):
         result.timestamp_ms = timestamp_ms
         self._detection_result_list.append(result)
 
     def start_detection(self, just_rtn_frame=False):
+        current_time = time.time()
+        # Limiting framerate
+        if (current_time - self.prev_time) < 1.0 / self.target_fps:
+            return None
+        
         rtn_val = None
         success, frame = self._videoInput.read()
         if not success:
@@ -243,6 +262,9 @@ class GestureDetection(Camera):
                 mp_drawing_styles.get_default_hand_connections_style())
             self._detection_result_list.clear()
     
+        # Update the previous time after processing the frame
+        self.prev_time = current_time
+
         # Just return frame
         if just_rtn_frame:
             return (current_frame, rtn_val)

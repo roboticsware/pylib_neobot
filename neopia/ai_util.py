@@ -42,7 +42,8 @@ class AiUtil(object):
     @staticmethod
     def draw_boundingbox(
         image,
-        detection_result
+        detection_result,
+        CPC
     ) -> np.ndarray:
         """Draws bounding boxes on the input image and return it.
         Args:
@@ -52,6 +53,7 @@ class AiUtil(object):
             Image with bounding boxes.
         """
         category_names = []
+        coordinates_list = []  # To store the center coordinates
         for detection in detection_result.detections:
             # Draw bounding_box
             bbox = detection.bounding_box
@@ -69,8 +71,22 @@ class AiUtil(object):
                             MARGIN + ROW_SIZE + bbox.origin_y)
             cv2.putText(image, result_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                         FONT_SIZE, TEXT_COLOR, FONT_THICKNESS)
+            
+            # Draw center point coordinates
+            if CPC == True:
+                center_x = int(bbox.origin_x + bbox.width / 2)
+                center_y = int(bbox.origin_y + bbox.height / 2)
+                center_point = (center_x, center_y)
+                coordinates_list.append(center_point)
+                cv2.circle(image, center_point, 5, TEXT_COLOR, -1)
+                
+                coordinates_text = f"({center_point[0]}, {center_point[1]})"
+                display_text = f"{coordinates_text}"
+                text_position = (center_point[0] + 10, center_point[1] - 10)
+                cv2.putText(image, display_text, text_position, cv2.FONT_HERSHEY_PLAIN, 
+                            FONT_SIZE, TEXT_COLOR, FONT_THICKNESS)
 
-        return (image, category_names)  # But returns only the last detection
+        return (image, category_names, coordinates_list)  # But returns only the last detection
     
     @staticmethod
     def get_handlandmarks(current_frame, detection_result_list):

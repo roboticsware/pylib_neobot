@@ -144,7 +144,7 @@ class PoseDetection(Camera):
 
 
 class ObjectDetection(Camera):
-    def __init__(self, target_fps=30):
+    def __init__(self, target_fps=30, center_point_xy = False):
         super().__init__()
         self._detection_result_list = []
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'efficientdet.tflite')
@@ -160,6 +160,8 @@ class ObjectDetection(Camera):
 
         self.target_fps = target_fps
         self.prev_time = 0
+
+        self.center_point_xy = center_point_xy
 
     def _visualize_callback(self, result,
                          output_image: mp.Image, timestamp_ms: int):
@@ -187,8 +189,9 @@ class ObjectDetection(Camera):
         current_frame = cv2.cvtColor(current_frame, cv2.COLOR_RGB2BGR)
 
         if self._detection_result_list:
-            vis_image, obj_name = AiUtil.draw_boundingbox(current_frame, self._detection_result_list[0])
-            rtn_val = obj_name
+            vis_image, obj_name, obj_coords = AiUtil.draw_boundingbox(
+                current_frame, self._detection_result_list[0], self.center_point_xy)
+            rtn_val = (obj_name, obj_coords) 
             self._detection_result_list.clear()
             current_frame = vis_image
         

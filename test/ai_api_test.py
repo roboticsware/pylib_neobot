@@ -33,11 +33,14 @@ n = Neosoco()
 
 
 ### Object detection
-od = ObjectDetection(target_fps=10) 
+od = ObjectDetection(target_fps=3, center_point_xy=True) 
 if od.camera_open(0):
     while True:
-        obj = od.start_detection()
-        print(obj)
+        detection_result = od.start_detection()
+        if detection_result:
+            obj_names, obj_coords = detection_result
+            print(f"Objects: {obj_names}")
+            print(f"Coordinates: {obj_coords}")
 
 
 import sys, keyboard

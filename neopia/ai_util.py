@@ -43,7 +43,7 @@ class AiUtil(object):
     def draw_boundingbox(
         image,
         detection_result,
-        CPC
+        cpc
     ) -> np.ndarray:
         """Draws bounding boxes on the input image and return it.
         Args:
@@ -73,7 +73,7 @@ class AiUtil(object):
                         FONT_SIZE, TEXT_COLOR, FONT_THICKNESS)
             
             # Draw center point coordinates
-            if CPC == True:
+            if cpc == True:
                 center_x = int(bbox.origin_x + bbox.width / 2)
                 center_y = int(bbox.origin_y + bbox.height / 2)
                 center_point = (center_x, center_y)

@@ -32,12 +32,21 @@ n = Neosoco()
 #         print(nose)
 
 
-### Object detection
-od = ObjectDetection(target_fps=10) 
-if od.camera_open(0):
+### Object detection (Following a sports ball)
+od = ObjectDetection(target_fps=3, center_point_xy=True) 
+if od.camera_open(0):  # Try 0, 1 or 2
     while True:
-        obj = od.start_detection()
-        print(obj)
+        detection_result = od.start_detection()
+        print(f"Objects: {detection_result}")
+        if detection_result:
+            obj_names, obj_coords = detection_result
+            if 'sports ball' in obj_names:  # It has to be a football/soccer ball, or just use other objects
+                n.led_on('out1', '100')
+                n.motor_rotate('both', 'forward', '10')
+                wait(1000)
+                n.led_off('out1')
+            else:
+                n.motor_rotate('both', 'left', '10')
 
 
 import sys, keyboard

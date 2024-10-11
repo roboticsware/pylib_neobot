@@ -10,4 +10,4 @@ Currently support NEO SoCo only
 ``pip install -U neopia``
 
 ## API documentation
-Refer to the [Wiki](https://github.com/roboticsware/pylib_neobot/wiki/List-of-APIs)
+Refer to the [Wiki](https://github.com/roboticsware/pylib_neobot/wiki)

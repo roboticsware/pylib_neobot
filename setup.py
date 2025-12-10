@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name="neopia",
-	version="0.3.6",
+	version="0.3.7",
 	author="RoboticsWare",
 	author_email="neopia.uz@google.com",
 	description="Python library for NEOPIA Neobot",
@@ -19,12 +19,12 @@ setup(
         "speechrecognition",
         "pyaudio",
         "gtts",
-        "playsound",
+        "playsound3",
         "mediapipe",
 	],
 	packages=find_packages(exclude=["examples", "tests"]),
     package_data={'neopia': ['model/*.*']},
-	python_requires=">=3",
+	python_requires=">=3.8",
 	zip_safe=False,
 	classifiers=[
 		"License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)"

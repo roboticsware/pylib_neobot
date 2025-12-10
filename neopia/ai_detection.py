@@ -20,7 +20,7 @@ import cv2
 import speech_recognition as sr
 import gtts
 import uuid, os, time
-import playsound
+import playsound3
 from neopia.opencv_camera import Camera
 import mediapipe as mp
 from mediapipe.tasks import python
@@ -318,7 +318,7 @@ shared_fname = None
 tl = threading.Lock()
 def thread_run(lock):
     lock.acquire()
-    playsound.playsound(shared_fname, block=True)
+    playsound3.playsound(shared_fname, block=True)
     lock.release()
 
 class Voice(object):
@@ -344,7 +344,7 @@ class Voice(object):
         fname = str(uuid.uuid1()) + ".mp3"
         with open(fname, 'wb+') as f:
             tts.write_to_fp(f)
-        playsound.playsound(fname)
+        playsound3.playsound(fname)
         os.remove(fname)
 
     @staticmethod

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name="neopia",
-	version="0.3.8",
+	version="0.3.9",
 	author="RoboticsWare",
 	author_email="neopia.uz@google.com",
 	description="Python library for NEOPIA Neobot",
@@ -14,6 +14,7 @@ setup(
         "pyserial", 
         "websocket-client",
         "pynput",
+        "numpy < 2.0",
         "opencv-python==4.6.0.66",
         "opencv-contrib-python==4.6.0.66",
         "speechrecognition",

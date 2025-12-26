@@ -1,6 +1,6 @@
 from neopia import *
 
-n = Neosoco()
+# n = Neosoco()
 
 ### Face detection
 # fd = FaceDetection()
@@ -33,52 +33,47 @@ n = Neosoco()
 
 
 ### Object detection (Following a sports ball)
-od = ObjectDetection(target_fps=3, center_point_xy=True) 
-if od.camera_open(0):  # Try 0, 1 or 2
-    while True:
-        detection_result = od.start_detection()
-        print(f"Objects: {detection_result}")
-        if detection_result:
-            obj_names, obj_coords = detection_result
-            if 'sports ball' in obj_names:  # It has to be a football/soccer ball, or just use other objects
-                n.led_on('out1', '100')
-                n.motor_rotate('both', 'forward', '10')
-                wait(1000)
-                n.led_off('out1')
-            else:
-                n.motor_rotate('both', 'left', '10')
+# od = ObjectDetection() 
+# if od.camera_open(0):  # Try 0, 1 or 2
+#     while True:
+#         detection_result = od.start_detection()
+#         if detection_result:
+#             obj_names, obj_coords = detection_result
+#             print(f"Objects: {detection_result}")
+#             if 'sports ball' in obj_names:  # It has to be a football/soccer ball, or just use other objects
+#                 n.led_on('out1', '100')
+#                 n.motor_rotate('both', 'forward', '10')
+#                 wait(1000)
+#                 n.led_off('out1')
+#             else:
+#                 n.motor_rotate('both', 'left', '10')
 
 
-import sys, keyboard
-def on_press(key): 
-    if key == Keyboard.ESC:
-    #   sys.exit()
-        return False
-    
-def on_space():
-    print("pressed")
-    sys.exit()
-keyboard.add_hotkey('space', on_space)
-
+## Gesture detection
 # gd = GestureDetection(target_fps=10)
 # if gd.camera_open(0):
 #     while True:
 #         category = gd.start_detection()
 #         if category == "Open_Palm":
+#             print("Forward")
 #             n.motor_move('forward')  
 #         elif category == "Closed_Fist":
+#             print("Stop")
 #             n.motor_stop()
 #         elif category == "Thumb_Up":
+#             print("Right")
 #             n.motor_move('right')
 #         elif category == "Thumb_Down":
+#             print("Left")
 #             n.motor_move('left')
 #         elif category == "Pointing_Up":
+#             print("Backward")
 #             n.motor_move('backward')
 
 
 ### QR code detection
 # qr = QRDetection()
-# if qr.camera_open(1):
+# if qr.camera_open(0):
 #     while True:
 #         decode_data = qr.start_detection()
 #         if decode_data:
@@ -90,18 +85,15 @@ keyboard.add_hotkey('space', on_space)
 
 ### Voice TTS / STT
 # import time
-# result = False
-# while not result:
-#     try:    
-#         Voice.tts("I'm hearing. Please speak in 3 secconds.")
-#         print("Eshityapman. 3 soniya ichida gapirib bering.")
-#         result = Voice.stt()
-#         print(result)
-#         if result == "Chiroqni yoq":
-#             n.led_on()
-#             time.sleep(3)
-#         elif result == "Chiroqni o'chir":
-#             n.led_off()
-#             time.sleep(3)
-#     except:
-#         result = False
+# while True:
+#     Voice.tts("I'm hearing. Please speak in 3 secconds.")
+#     print("Eshityapman. 3 soniya ichida gapirib bering.")
+#     result = Voice.stt()
+#     print(result)
+#     if result == "yoqing" or result == "yuking":
+#         n.led_on()
+#         time.sleep(3)
+#         break
+#     elif result == "o'chiring" or result == "uchiring":
+#         n.led_off()
+#         break

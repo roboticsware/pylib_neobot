@@ -19,267 +19,241 @@
 import cv2
 import speech_recognition as sr
 import gtts
-import uuid, os, time
+import uuid, os, time, atexit, signal
+import threading
 import playsound3
-from neopia.opencv_camera import Camera
+
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
+from neopia.opencv_camera import Camera
 from neopia.ai_util import AiUtil
 
-mp_hands = mp.solutions.hands
-mp_drawing_styles = mp.solutions.drawing_styles
 mp_drawing = mp.solutions.drawing_utils
-mp_face_mesh = mp.solutions.face_mesh
-mp_pose = mp.solutions.pose
-pose = mp_pose.Pose()
+mp_drawing_styles = mp.solutions.drawing_styles
 
-# For face mesh:
-drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
-face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, min_detection_confidence=0.5)
 
 class FaceMeshDetection(Camera):
     def __init__(self):
         super().__init__()
+        # DrawingSpec for 0.10.x mediapipe API 
+        self.drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+        self.face_mesh = mp.solutions.face_mesh.FaceMesh(
+            static_image_mode=True, 
+            max_num_faces=1, 
+            min_detection_confidence=0.5
+        )
 
     def start_detection(self, just_rtn_frame=False):
         rtn_val = False
-        _, frame = self._videoInput.read()
+        success, frame = self._videoInput.read()
+        if not success: return False
+        
         frame = cv2.flip(frame, 1)
-        results = face_mesh.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # BGR to RGB conversion
+        results = self.face_mesh.process(rgb_frame)
 
-        # Draw face mesh landmarks on the image.
+        # Draw face mesh landmarks on the image
         if results.multi_face_landmarks:
-            annotated_image = frame.copy()
+            rtn_val = True
             for face_landmarks in results.multi_face_landmarks:
                 mp_drawing.draw_landmarks(
-                    image=annotated_image,
+                    image=frame,
                     landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_CONTOURS,
-                    landmark_drawing_spec=drawing_spec,
-                    connection_drawing_spec=drawing_spec)
-            
-            frame = annotated_image 
-            rtn_val = True
-        
+                    connections=mp.solutions.face_mesh.FACEMESH_CONTOURS,
+                    landmark_drawing_spec=self.drawing_spec,
+                    connection_drawing_spec=self.drawing_spec
+                )
         # Just return frame
         if just_rtn_frame:
             return frame
-        else:
-            cv2.imshow('Face detection', frame)
-            if cv2.waitKey(1) == 27:  # ESC pressed
-                os._exit(1)
-            rtn_val = False
-    
+        
+        cv2.imshow('Face Mesh Detection', frame)
+        if cv2.waitKey(1) == 27: os._exit(1)  # ESC pressed
         return rtn_val
-
-    def __del__(self):
-        super().__del__()
-
 
 class FaceDetection(Camera):
     def __init__(self):
         super().__init__()
-        self._face_cascade = cv2.CascadeClassifier(
-            os.path.join(os.path.dirname(__file__), 'model', 'haarcascade_frontalface_default.xml'))
+        # 0.10.x mediapipe Task API
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'face_detector.tflite')
+        base_options = python.BaseOptions(model_asset_path=model_path)
+        options = vision.FaceDetectorOptions(
+            base_options=base_options,
+            running_mode=vision.RunningMode.LIVE_STREAM,
+            result_callback=self._visualize_callback
+        )
+        self._detector = vision.FaceDetector.create_from_options(options)
+        self._result = None
+        self._counter = 0
+
+    def _visualize_callback(self, result, output_image, timestamp_ms):
+        self._result = result
 
     def start_detection(self, just_rtn_frame=False):
-        _, frame = self._videoInput.read()
-        frame = cv2.flip(frame, 1)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = self._face_cascade.detectMultiScale(gray, 1.1, 5)
-        
-        # Show rect on faces
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+        success, frame = self._videoInput.read()
+        if not success: return (frame, 0) if just_rtn_frame else 0
 
+        self._counter += 1
+        frame = cv2.flip(frame, 1)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # Convert the frame to RGB
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+
+        self._detector.detect_async(mp_image, int(time.time() * 1000))
+
+        face_count = 0
+        if self._result and self._result.detections:
+            face_count = len(self._result.detections)
+            for detection in self._result.detections:
+                # Draw bounding box
+                bbox = detection.bounding_box
+                start_point = int(bbox.origin_x), int(bbox.origin_y)
+                end_point = int(bbox.origin_x + bbox.width), int(bbox.origin_y + bbox.height)
+                cv2.rectangle(frame, start_point, end_point, (255, 0, 0), 2)
+        
         # Just return frame
         if just_rtn_frame:
-            return (frame, len(faces))
-        else:
-            cv2.imshow('Face detection', frame)
-            if cv2.waitKey(1) == 27:  # ESC pressed
-                os._exit(1)
-    
-        return len(faces)
-
-    def __del__(self):
-        super().__del__()
-
-
+            return (frame, face_count)
+        
+        cv2.imshow('Face Detection', frame)
+        if cv2.waitKey(1) == 27: os._exit(1)  # ESC pressed
+        return face_count
 class PoseDetection(Camera):
     def __init__(self):
         super().__init__()
+        self.mp_pose = mp.solutions.pose
+        self.pose = self.mp_pose.Pose()
 
     def start_detection(self, just_rtn_frame=False):
-        rtn_val = (0, 0)  # Tuple
         success, frame = self._videoInput.read()
-        if not success:
-            print("Frame is not ready!, Try again.")
-            return rtn_val
-        frame = cv2.flip(frame, 1) 
-        result = pose.process(frame)
-        if result.pose_landmarks:
-            # Save the coords of nose
-            rtn_val = (result.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].x * self._width,
-                        result.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].y * self._height)
+        if not success: return (0, 0)
+
+        frame = cv2.flip(frame, 1)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # BGR to RGB conversion
+        result = self.pose.process(rgb_frame)
         
-            #Draw the framework of body onto the processed image and then show it in the preview window
-            mp_drawing.draw_landmarks(frame,result.pose_landmarks,mp_pose.POSE_CONNECTIONS)
-        else:
-            rtn_val = (0, 0)
+        coords = (0, 0)
+        if result.pose_landmarks:
+            nose = result.pose_landmarks.landmark[self.mp_pose.PoseLandmark.NOSE]
+            coords = (nose.x * self._width, nose.y * self._height)
+            mp_drawing.draw_landmarks(frame, result.pose_landmarks, self.mp_pose.POSE_CONNECTIONS)
 
         # Just return frame
         if just_rtn_frame:
-            return (frame, rtn_val)
-        else:
-            cv2.imshow('Pose detection', frame)
-            if cv2.waitKey(1) == 27:  # ESC pressed
-                os._exit(1)
-    
-        return rtn_val
-
-    def __del__(self):
-        super().__del__()
+            return (frame, coords)
+        
+        cv2.imshow('Pose Detection', frame)
+        if cv2.waitKey(1) == 27: os._exit(1)  # ESC pressed
+        return coords
 
 
 class ObjectDetection(Camera):
-    def __init__(self, target_fps=30, center_point_xy = False):
+    def __init__(self, target_fps=30, center_point_xy=False):
         super().__init__()
-        self._detection_result_list = []
-        model_path = os.path.join(os.path.dirname(__file__), 'model', 'efficientdet.tflite')
-        # Initialize the object detection model
-        # model_asset_buffer is from https://github.com/google-ai-edge/mediapipe/issues/4983
-        base_options = python.BaseOptions(model_asset_buffer = open(model_path, "rb").read())
-        options = vision.ObjectDetectorOptions(base_options=base_options,
-                                                running_mode=vision.RunningMode.LIVE_STREAM,
-                                                score_threshold=0.5,
-                                                result_callback=self._visualize_callback)
-        self._detector = vision.ObjectDetector.create_from_options(options)
-        self._counter = 0
+        # Changed model to ssd_mobilenet_v2 for better performance in low-end systems
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'ssd_mobilenet_v2.tflite')
+        
+        base_options = python.BaseOptions(model_asset_path=model_path)
 
+        # Choose VIDEO mode for Windows CPU optimization
+        options = vision.ObjectDetectorOptions(
+            base_options=base_options,
+            running_mode=vision.RunningMode.VIDEO, 
+            score_threshold=0.5,
+            max_results=3
+        )
+        self._detector = vision.ObjectDetector.create_from_options(options)
         self.target_fps = target_fps
         self.prev_time = 0
-
         self.center_point_xy = center_point_xy
 
-    def _visualize_callback(self, result,
-                         output_image: mp.Image, timestamp_ms: int):
-        result.timestamp_ms = timestamp_ms
-        self._detection_result_list.append(result)
-
     def start_detection(self, just_rtn_frame=False):
-        current_time = time.time()
+        now = time.time()
         # Limiting framerate
-        if (current_time - self.prev_time) < 1.0 / self.target_fps:
+        if (now - self.prev_time) < 1.0 / self.target_fps:
             return None
+
+        success, frame = self._videoInput.read()
+        if not success: return None
         
-        rtn_val = None
-        _, frame = self._videoInput.read()
-        self._counter += 1
         frame = cv2.flip(frame, 1)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
-        # Convert the image from BGR to RGB as required by the TFLite model.
-        rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+        # In VIDEO mode, results are returned immediately without callback
+        detection_result = self._detector.detect_for_video(mp_image, int(now * 1000))
+        self.prev_time = now
 
-        # Run object detection using the model.
-        self._detector.detect_async(mp_image, self._counter)
-        current_frame = mp_image.numpy_view()
-        current_frame = cv2.cvtColor(current_frame, cv2.COLOR_RGB2BGR)
+        rtn_data = None
+        if detection_result:
+            # Draw bounding box using AiUtil
+            frame, obj_name, obj_coords = AiUtil.draw_boundingbox(frame, detection_result, self.center_point_xy)
+            rtn_data = (obj_name, obj_coords)
 
-        if self._detection_result_list:
-            vis_image, obj_name, obj_coords = AiUtil.draw_boundingbox(
-                current_frame, self._detection_result_list[0], self.center_point_xy)
-            rtn_val = (obj_name, obj_coords) 
-            self._detection_result_list.clear()
-            current_frame = vis_image
-        
-        # Update the previous time after processing the frame
-        self.prev_time = current_time
-            
-        # Just return frame
         if just_rtn_frame:
-            return (current_frame, rtn_val)
+            return (frame, rtn_data)
         else:
-            cv2.imshow('Object detection', current_frame)
-            if cv2.waitKey(1) == 27:  # ESC pressed
-                os._exit(1)
-
-        return rtn_val
-
-    def __del__(self):
-        super().__del__()
-
-
+            cv2.imshow('Object Detection', frame)
+            if cv2.waitKey(1) == 27: os._exit(1)  # ESC pressed
+        
+        return rtn_data
+    
 class GestureDetection(Camera):
     def __init__(self, target_fps=30):
         super().__init__()
-        self._detection_result_list = []
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'gesture_recognizer.task')
-        # Initialize the object detection model
-        # model_asset_buffer is from https://github.com/google-ai-edge/mediapipe/issues/4983
-        base_options = python.BaseOptions(model_asset_buffer = open(model_path, "rb").read())
-        options = vision.GestureRecognizerOptions(base_options=base_options,
-                                                running_mode=vision.RunningMode.LIVE_STREAM,
-                                                result_callback=self._visualize_callback)
+        base_options = python.BaseOptions(model_asset_path=model_path)
+        options = vision.GestureRecognizerOptions(
+            base_options=base_options,
+            running_mode=vision.RunningMode.LIVE_STREAM,
+            result_callback=self._visualize_callback
+        )
         self._detector = vision.GestureRecognizer.create_from_options(options)
-
+        self._result = None
         self.target_fps = target_fps
         self.prev_time = 0
 
-    def _visualize_callback(self, result,
-                         output_image: mp.Image, timestamp_ms: int):
-        result.timestamp_ms = timestamp_ms
-        self._detection_result_list.append(result)
+    def _visualize_callback(self, result, output_image, timestamp_ms):
+        self._result = result
 
     def start_detection(self, just_rtn_frame=False):
-        current_time = time.time()
+        now = time.time()
         # Limiting framerate
-        if (current_time - self.prev_time) < 1.0 / self.target_fps:
-            return None
-        
-        rtn_val = None
+        if (now - self.prev_time) < 1.0 / self.target_fps:
+            return (None, None) if just_rtn_frame else None
+
         success, frame = self._videoInput.read()
-        if not success:
-            print("Frame is not ready!, Try again.")
-            return rtn_val
-        frame = cv2.flip(frame, 1)
+        if not success: return (None, None) if just_rtn_frame else None
 
-        # Convert the image from BGR to RGB as required by the TFLite model.
-        rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+        frame = cv2.flip(frame, 1)  # Flip the frame horizontally
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # BGR to RGB conversion
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
-        # Run object detection using the model.
-        self._detector.recognize_async(mp_image, time.time_ns() // 1_000_000)
-        current_frame = frame
+        self._detector.recognize_async(mp_image, int(now * 1000))
+        self.prev_time = now
 
-        if self._detection_result_list:
-            hand_landmarks_proto, category_name = AiUtil.get_handlandmarks(current_frame, self._detection_result_list[0])
-            rtn_val = category_name
-            mp_drawing.draw_landmarks(
-                current_frame,
-                hand_landmarks_proto,
-                mp_hands.HAND_CONNECTIONS,
-                mp_drawing_styles.get_default_hand_landmarks_style(),
-                mp_drawing_styles.get_default_hand_connections_style())
-            self._detection_result_list.clear()
-    
-        # Update the previous time after processing the frame
-        self.prev_time = current_time
+        gesture_name = None
+        if self._result:
+            # Get landmarks and gesture name using AiUtil
+            hand_landmarks_proto, gesture_name = AiUtil.get_handlandmarks(frame, self._result)
+            
+            if hand_landmarks_proto:
+                # Drawing landmarks using Solutions API
+                mp.solutions.drawing_utils.draw_landmarks(
+                    frame,
+                    hand_landmarks_proto,
+                    mp.solutions.hands.HAND_CONNECTIONS,
+                    mp.solutions.drawing_styles.get_default_hand_landmarks_style(),
+                    mp.solutions.drawing_styles.get_default_hand_connections_style()
+                )
 
         # Just return frame
         if just_rtn_frame:
-            return (current_frame, rtn_val)
-        else:
-            cv2.imshow('Gesture detection', current_frame)
-            if cv2.waitKey(1) == 27:  # ESC pressed
-                os._exit(1)
+            return (frame, gesture_name)
         
-        return rtn_val
-
-    def __del__(self):
-        super().__del__()        
+        cv2.imshow('Gesture Detection', frame)
+        if cv2.waitKey(1) == 27: os._exit(1)   # ESC pressed
+        return gesture_name
 
 
 class QRDetection(Camera):
@@ -305,51 +279,63 @@ class QRDetection(Camera):
             return (frame, data)
         else:
             cv2.imshow('QR detection', frame)
-            if cv2.waitKey(1) == 27:  # ESC pressed
-                os._exit(1)
+            if cv2.waitKey(1) == 27: os._exit(1)  # ESC pressed
         return data
 
     def __del__(self):
         super().__del__()
 
 
-import threading
-shared_fname = None
-tl = threading.Lock()
-def thread_run(lock):
-    lock.acquire()
-    playsound3.playsound(shared_fname, block=True)
-    lock.release()
+class Voice:
+    _lock = threading.Lock()
+    _temp_files = [] 
 
-class Voice(object):
+    @staticmethod  # Use staticmethod instead of classmethod to avoid an error of registering atexit
+    def _cleanup_temp_files(signum=None):
+        for fname in Voice._temp_files:
+            if os.path.exists(fname):
+                os.remove(fname)
+        Voice._temp_files.clear()
+
+        # Exit this process normally if a signal is received
+        if signum is not None:
+            os._exit(1)
+
     @staticmethod
     def stt(audioId=0, language='uz-UZ'):
         r = sr.Recognizer()
-        mic = sr.Microphone(audioId)
-        audio = None
-        with mic:
-            r.adjust_for_ambient_noise(mic)
-            audio = r.listen(mic, 3)  # Timeout in 3 sec
-        try:
-            result = r.recognize_google(audio, language=language)
-        except sr.UnknownValueError:  # The speech is unintelligible
-            result = False
-        except Exception as error:
-            raise error
-        return result
+        with sr.Microphone(device_index=audioId) as source:
+            r.adjust_for_ambient_noise(source)
+            try:
+                audio = r.listen(source, timeout=3)
+                return r.recognize_google(audio, language=language)
+            except:
+                return False
     
     @staticmethod
     def tts(text, lang='en'):
-        tts = gtts.gTTS(text=text, lang=lang)
-        fname = str(uuid.uuid1()) + ".mp3"
-        with open(fname, 'wb+') as f:
-            tts.write_to_fp(f)
-        playsound3.playsound(fname)
-        os.remove(fname)
+        filename = f"tts_{uuid.uuid4().hex}.mp3"
+        try:
+            gtts.gTTS(text=text, lang=lang).save(filename)
+            Voice._temp_files.append(filename)
+            playsound3.playsound(filename)
+        except Exception as e:
+            print(f"TTS Error: {e}")
+        finally:
+            if os.path.exists(filename):
+                os.remove(filename)
+                if filename in Voice._temp_files:
+                    Voice._temp_files.remove(filename)
 
     @staticmethod
     def playsound(fname):
-        global shared_fname
-        shared_fname = fname
-        thread = threading.Thread(target=thread_run, args=(tl,))
-        thread.start()
+        def run():
+            with Voice._lock:
+                playsound3.playsound(fname)
+        threading.Thread(target=run, daemon=True).start()
+
+# In case unexpected termination, register cleanup events
+atexit.register(Voice._cleanup_temp_files)
+# In case Ctrl+C (SIGINT) or Force Exit (SIGTERM)
+signal.signal(signal.SIGINT, Voice._cleanup_temp_files)
+signal.signal(signal.SIGTERM, Voice._cleanup_temp_files)

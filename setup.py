@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name="neopia",
-	version="0.3.10",
+	version="0.4.0",
 	author="RoboticsWare",
 	author_email="neopia.uz@google.com",
 	description="Python library for NEOPIA Neobot",
@@ -19,7 +19,8 @@ setup(
         "pyaudio",
         "gtts",
         "playsound3",
-        "mediapipe",
+        "mediapipe==0.10.11",
+        "protobuf<4.0.0,>=3.20.3",
 	],
 	packages=find_packages(exclude=["examples", "tests"]),
     package_data={'neopia': ['model/*.*']},
